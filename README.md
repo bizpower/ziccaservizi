@@ -12,7 +12,7 @@ deployato senza alcuna dipendenza dalla piattaforma Lovable.
 | Build | Vite 7 |
 | Stili | Tailwind CSS 4 + shadcn/ui (`components.json`) |
 | Backend | Supabase (Postgres + Auth + Storage) |
-| Runtime di deploy | Cloudflare Workers (`wrangler.jsonc`) |
+| Deploy | Vercel (build Nitro, Build Output API) |
 
 ## Struttura
 
@@ -66,15 +66,25 @@ npx supabase db push
 Il primo utente registrato può auto-assegnarsi il ruolo admin dalla pagina
 `/admin` (funzione `claimFirstAdmin`, attiva solo finché non esiste alcun admin).
 
-## Build e deploy (Cloudflare Workers)
+## Build e deploy (Vercel)
 
 ```bash
-npm run build
-npx wrangler deploy
+npm run build     # in locale produce .output/ (preset node-server)
 ```
 
-Il dominio del cliente si collega poi da Cloudflare (Workers → Custom Domains)
-oppure, se si sceglie un'altra piattaforma, dal relativo pannello.
+Su Vercel non serve configurazione particolare: Nitro rileva l'ambiente di build
+e genera `.vercel/output` (Build Output API v3). Impostazioni del progetto Vercel:
+
+- Framework preset: **Other**
+- Build command: `npm run build`
+- Output directory: lasciare vuoto (rilevato automaticamente)
+- Environment variables: quelle di `.env.example` (comprese le `VITE_*`,
+  necessarie anche in fase di build)
+
+Il dominio del cliente si collega poi da Vercel → Project → Domains.
+
+Per cambiare piattaforma basta il preset Nitro corrispondente
+(`NITRO_PRESET=cloudflare_module`, `netlify`, `node-server`, ecc.).
 
 ## Media
 
