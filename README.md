@@ -51,12 +51,22 @@ non deve mai finire nel bundle client.
 
 ## Database
 
-Le migrazioni in `supabase/migrations/` ricreano l'intero schema:
-ruoli (`user_roles` + funzione `has_role`), `site_settings`, `sectors`,
-`projects`, `certifications`, `leads`, `custom_sections`, policy RLS e bucket
-storage pubblico `media`.
+Progetto Supabase: **ZiccaServizi** (`mrbkuvbxqhwrtnhmpxum`, eu-west-1).
 
-Applicazione su un progetto Supabase nuovo:
+Lo stesso progetto ospita anche altre applicazioni, quindi tutte le tabelle del
+sito vivono nello **schema dedicato `zicca`** (mai in `public`) e i media nel
+bucket **`zicca-media`**:
+
+- `zicca.user_roles` + funzione `zicca.has_role` (ruolo admin)
+- `zicca.site_settings`, `zicca.sectors`, `zicca.projects`,
+  `zicca.certifications`, `zicca.leads`, `zicca.custom_sections`
+- RLS attiva su tutte le tabelle; le scritture applicative passano dalle server
+  function con client service role
+- lo schema `zicca` è esposto a PostgREST
+  (`pgrst.db_schemas = public, graphql_public, zicca`) e i client Supabase sono
+  configurati con `db: { schema: "zicca" }`
+
+Applicazione delle migrazioni su un altro progetto:
 
 ```bash
 npx supabase link --project-ref <project-ref>

@@ -18,7 +18,8 @@ function createSupabaseAdminClient() {
     throw new Error(message);
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  return createClient<Database, "zicca">(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    db: { schema: "zicca" },
     auth: {
       storage: undefined,
       persistSession: false,

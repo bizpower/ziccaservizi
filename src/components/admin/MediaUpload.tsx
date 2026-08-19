@@ -23,12 +23,12 @@ export function MediaUpload({
     try {
       const ext = file.name.split(".").pop() ?? "bin";
       const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await supabase.storage.from("media").upload(path, file, {
+      const { error } = await supabase.storage.from("zicca-media").upload(path, file, {
         upsert: false,
         contentType: file.type,
       });
       if (error) throw error;
-      const { data } = supabase.storage.from("media").getPublicUrl(path);
+      const { data } = supabase.storage.from("zicca-media").getPublicUrl(path);
       onChange(data.publicUrl);
       toast.success("File caricato");
     } catch (e: any) {

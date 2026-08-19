@@ -18,7 +18,10 @@ function createSupabaseClient() {
     throw new Error(message);
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  return createClient<Database, "zicca">(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    // Le tabelle del sito vivono nello schema dedicato `zicca` (il progetto
+    // Supabase ospita anche altre applicazioni).
+    db: { schema: "zicca" },
     auth: {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
       persistSession: true,

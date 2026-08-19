@@ -26,7 +26,7 @@ degli originali: basta sovrascriverli con i file veri, senza toccare il codice.
 
 I video sono grandi (19–78 MB l'uno, ~430 MB in totale): non vanno messi nel
 repository né tra gli asset statici del Worker. Vanno caricati su storage
-esterno — consigliato il bucket `media` di Supabase Storage, già creato dalle
+esterno — consigliato il bucket `zicca-media` di Supabase Storage, già creato dalle
 migrazioni, oppure Cloudflare R2 / Stream.
 
 Dopo l'upload va compilato il campo `url` del rispettivo manifest:
@@ -49,7 +49,7 @@ Esempio di manifest compilato:
 ```json
 {
   "version": 1,
-  "url": "https://<project-ref>.supabase.co/storage/v1/object/public/media/videos/sgarro-web.mp4",
+  "url": "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/videos/sgarro-web.mp4",
   "original_filename": "sgarro-web.mp4",
   "size": 19834195,
   "content_type": "video/mp4"
