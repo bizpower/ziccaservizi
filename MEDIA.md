@@ -20,26 +20,86 @@ byte per byte (md5 identico all'originale Lovable):
 
 Restano da trasferire solo i **video** (punto 2).
 
-## 2. Video (hosting esterno)
+## 2. Video: da trasferire
 
-I video sono grandi (19–78 MB l'uno, ~430 MB in totale): non vanno messi nel
-repository né tra gli asset statici del Worker. Vanno caricati su storage
-esterno — consigliato il bucket `zicca-media` di Supabase Storage, già creato dalle
-migrazioni, oppure Cloudflare R2 / Stream.
+Gli 8 video (con i rispettivi poster) sono ancora solo nel progetto Lovable.
+Non è stato possibile trasferirli automaticamente per due motivi:
 
-Dopo l'upload va compilato il campo `url` del rispettivo manifest:
+- il workspace Lovable ha **esaurito i crediti** durante il trasferimento (le
+  immagini erano già state recuperate), quindi non è più possibile far eseguire
+  comandi all'agente Lovable;
+- pesano complessivamente ~430 MB: non possono stare nel repository e vanno
+  caricati su storage esterno.
+
+| File | Dimensione | Poster |
+| --- | --- | --- |
+| `capo-ti-segue-web.mp4` | 44,6 MB | 227 KB |
+| `ca-granda-spiegazione-web.mp4` | 77,5 MB | 477 KB |
+| `qualche-modo-web.mp4` | 26,9 MB | 210 KB |
+| `sgarro-web.mp4` | 19,8 MB | 182 KB |
+| `revamping-web.mp4` | 78,7 MB | 350 KB |
+| `tata-parla.mp4` (Milano United) | 50,6 MB | 94 KB |
+| `challenge-2.mp4` (Milano United) | 37,9 MB | 59 KB |
+| `vero-calcio.mp4` (Milano United) | 42,2 MB | 105 KB |
+
+### Attenzione al limite di 50 MB
+
+Il piano Free di Supabase Storage accetta file fino a **50 MB**. Tre video lo
+superano (`ca-granda-spiegazione-web.mp4`, `revamping-web.mp4` e, di poco,
+`tata-parla.mp4`): vanno ricompressi prima dell'upload — cosa comunque
+consigliabile per il web:
+
+```bash
+ffmpeg -i originale.mp4 -c:v libx264 -crf 28 -preset slow \
+       -c:a aac -b:a 96k -movflags +faststart compresso.mp4
+```
+
+In alternativa si passa a un piano superiore o si usa un altro storage
+(Cloudflare R2/Stream, Bunny).
+
+### Upload nel bucket `zicca-media`
+
+Il modo più semplice è dal dashboard Supabase → Storage → `zicca-media`,
+creando la cartella `videos/` (e `videos/posters/` per le anteprime).
+
+Da riga di comando servono i permessi di admin; in fase di migrazione era stata
+usata una finestra temporanea con la chiave anon, aperta e richiusa con:
+
+```sql
+-- apertura (solo per il tempo dell'upload)
+CREATE POLICY "Zicca temp migration upload"
+  ON storage.objects FOR INSERT TO anon
+  WITH CHECK (bucket_id = 'zicca-media' AND name LIKE 'videos/%');
+
+-- chiusura (obbligatoria a upload finito)
+DROP POLICY "Zicca temp migration upload" ON storage.objects;
+```
+
+```bash
+BASE=https://mrbkuvbxqhwrtnhmpxum.supabase.co
+KEY=<chiave anon del progetto>
+curl -sS -X POST "$BASE/storage/v1/object/zicca-media/videos/sgarro-web.mp4" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+  -H "Content-Type: video/mp4" -H "x-upsert: true" \
+  --data-binary @sgarro-web.mp4
+```
+
+### Compilare i manifest
+
+Dopo l'upload va scritto l'URL pubblico nel campo `url` del manifest
+corrispondente:
 
 ```
 src/assets/videos/
-  capo-ti-segue-web.mp4.asset.json          (44,6 MB)  + poster (227 KB)
-  ca-granda-spiegazione-web.mp4.asset.json  (77,5 MB)  + poster (477 KB)
-  qualche-modo-web.mp4.asset.json           (26,9 MB)  + poster (210 KB)
-  sgarro-web.mp4.asset.json                 (19,8 MB)  + poster (182 KB)
-  revamping-web.mp4.asset.json              (78,7 MB)  + poster (350 KB)
+  capo-ti-segue-web.mp4.asset.json          + capo-ti-segue-poster.jpg.asset.json
+  ca-granda-spiegazione-web.mp4.asset.json  + ca-granda-spiegazione-poster.jpg.asset.json
+  qualche-modo-web.mp4.asset.json           + qualche-modo-poster.jpg.asset.json
+  sgarro-web.mp4.asset.json                 + sgarro-poster.jpg.asset.json
+  revamping-web.mp4.asset.json              + revamping-poster.jpg.asset.json
 src/assets/milano-united/
-  tata-parla.mp4.asset.json                 (50,6 MB)  + poster (94 KB)
-  challenge-2.mp4.asset.json                (37,9 MB)  + poster (59 KB)
-  vero-calcio.mp4.asset.json                (42,2 MB)  + poster (105 KB)
+  tata-parla.mp4.asset.json                 + tata-parla-poster.jpg.asset.json
+  challenge-2.mp4.asset.json                + challenge-2-poster.jpg.asset.json
+  vero-calcio.mp4.asset.json                + vero-calcio-poster.jpg.asset.json
 ```
 
 Esempio di manifest compilato:
