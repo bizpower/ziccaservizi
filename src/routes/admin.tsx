@@ -39,7 +39,6 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/contenuti", label: "Contenuti sito", icon: Settings },
 ];
 
-
 function AdminLayout() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -95,8 +94,8 @@ function AdminLayout() {
           <ShieldCheck className="h-12 w-12 mx-auto text-electric mb-4" />
           <h1 className="font-display text-2xl font-bold mb-2">Account non abilitato</h1>
           <p className="text-white/70 text-sm mb-6">
-            Il tuo account <strong>{user.email}</strong> non ha i permessi di amministratore.
-            {" "}Se sei il primo utente del sistema puoi auto-nominarti amministratore.
+            Il tuo account <strong>{user.email}</strong> non ha i permessi di amministratore. Se sei
+            il primo utente del sistema puoi auto-nominarti amministratore.
           </p>
           <div className="flex flex-col gap-2">
             <button
@@ -121,7 +120,9 @@ function AdminLayout() {
       <aside className="hidden lg:flex w-64 flex-col bg-ink text-white sticky top-0 h-screen">
         <div className="px-6 py-5 border-b border-white/10">
           <Link to="/" className="flex items-center gap-2">
-            <span className="h-8 w-8 rounded-md gradient-electric grid place-items-center font-display font-bold">Z</span>
+            <span className="h-8 w-8 rounded-md gradient-electric grid place-items-center font-display font-bold">
+              Z
+            </span>
             <div>
               <div className="font-display font-bold leading-none">ZICCA</div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Admin</div>
@@ -137,7 +138,9 @@ function AdminLayout() {
                 key={item.to}
                 href={item.to}
                 className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition ${
-                  active ? "bg-electric/15 text-electric border border-electric/30" : "text-white/70 hover:bg-white/5 hover:text-white"
+                  active
+                    ? "bg-electric/15 text-electric border border-electric/30"
+                    : "text-white/70 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -159,8 +162,12 @@ function AdminLayout() {
 
       <div className="flex-1 min-w-0">
         <header className="lg:hidden bg-ink text-white px-4 py-3 flex items-center justify-between">
-          <Link to="/admin" className="font-display font-bold">ZICCA Admin</Link>
-          <button onClick={logout} className="text-sm text-white/70">Esci</button>
+          <Link to="/admin" className="font-display font-bold">
+            ZICCA Admin
+          </Link>
+          <button onClick={logout} className="text-sm text-white/70">
+            Esci
+          </button>
         </header>
         <nav className="lg:hidden flex overflow-x-auto bg-ink text-white/80 border-t border-white/10">
           {nav.map((i) => (

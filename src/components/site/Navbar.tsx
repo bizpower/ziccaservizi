@@ -29,14 +29,14 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => { setOpen(false); }, [path]);
+  useEffect(() => {
+    setOpen(false);
+  }, [path]);
 
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-        solid
-          ? "bg-background/85 backdrop-blur-xl border-b border-border"
-          : "bg-transparent"
+        solid ? "bg-background/85 backdrop-blur-xl border-b border-border" : "bg-transparent"
       }`}
     >
       <div className="container-px mx-auto max-w-7xl flex items-center justify-between h-16 md:h-20">
@@ -58,7 +58,9 @@ export function Navbar() {
                 key={l.to}
                 to={l.to}
                 className={`relative whitespace-nowrap px-3 py-2 text-sm font-medium leading-none transition-colors ${
-                  solid ? "text-foreground/80 hover:text-foreground" : "text-white/80 hover:text-white"
+                  solid
+                    ? "text-foreground/80 hover:text-foreground"
+                    : "text-white/80 hover:text-white"
                 }`}
               >
                 {l.label}
@@ -74,7 +76,9 @@ export function Navbar() {
           <Link
             to="/login"
             className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium uppercase tracking-wider transition-colors ${
-              solid ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white"
+              solid
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-white/70 hover:text-white"
             }`}
           >
             <Shield className="h-3.5 w-3.5" />

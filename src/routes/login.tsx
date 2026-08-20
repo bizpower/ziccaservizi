@@ -44,7 +44,10 @@ function LoginPage() {
   return (
     <div className="min-h-screen grid place-items-center bg-ink text-white px-6 py-24">
       <div className="w-full max-w-md">
-        <Link to="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-8">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-8"
+        >
           ← Torna al sito
         </Link>
         <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-elegant">
@@ -92,7 +95,8 @@ function LoginPage() {
             </button>
           </form>
           <p className="mt-6 text-xs text-white/50 leading-relaxed">
-            Accesso riservato al personale autorizzato di Zicca Servizi. Per richiedere le credenziali contatta l'amministratore IT.
+            Accesso riservato al personale autorizzato di Zicca Servizi. Per richiedere le
+            credenziali contatta l'amministratore IT.
           </p>
         </div>
       </div>
