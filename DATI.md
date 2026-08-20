@@ -7,13 +7,13 @@ leggere i dati dal database Lovable Cloud del progetto originale
 
 Tentativi effettuati (20/08/2026):
 
-| Canale | Esito |
-| --- | --- |
-| `query_database` (API Lovable) | errore `499 request_cancelled`, ripetuto |
-| Agente Lovable sul progetto (query di sola lettura) | `SUPABASE_INTERNAL_ERROR` / timeout |
-| CLI `lovable supabase query` (dal sandbox Lovable) | `gateway_timeout` / `gateway_unavailable` |
-| `psql` diretto (dal sandbox Lovable) | tenant/user non trovato |
-| REST API Supabase (da qui e dal sandbox Lovable) | rete bloccata / DNS non risolto |
+| Canale                                              | Esito                                     |
+| --------------------------------------------------- | ----------------------------------------- |
+| `query_database` (API Lovable)                      | errore `499 request_cancelled`, ripetuto  |
+| Agente Lovable sul progetto (query di sola lettura) | `SUPABASE_INTERNAL_ERROR` / timeout       |
+| CLI `lovable supabase query` (dal sandbox Lovable)  | `gateway_timeout` / `gateway_unavailable` |
+| `psql` diretto (dal sandbox Lovable)                | tenant/user non trovato                   |
+| REST API Supabase (da qui e dal sandbox Lovable)    | rete bloccata / DNS non risolto           |
 
 È un'indisponibilità del backend Lovable Cloud, non una perdita di dati: i dati
 sono ancora nel progetto originale.

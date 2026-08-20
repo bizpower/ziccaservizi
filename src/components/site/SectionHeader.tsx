@@ -11,14 +11,18 @@ export function SectionHeader({ eyebrow, title, description, align = "left" }: P
       {eyebrow && (
         <div className="inline-flex items-center gap-2 mb-5">
           <span className="h-px w-8 bg-electric" />
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-electric">{eyebrow}</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-electric">
+            {eyebrow}
+          </span>
         </div>
       )}
       <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
         {title}
       </h2>
       {description && (
-        <p className="mt-5 text-lg text-muted-foreground leading-relaxed text-balance">{description}</p>
+        <p className="mt-5 text-lg text-muted-foreground leading-relaxed text-balance">
+          {description}
+        </p>
       )}
     </div>
   );

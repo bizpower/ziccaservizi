@@ -4,49 +4,77 @@ import { VideoShowcase } from "@/components/site/VideoShowcase";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getSiteSettings } from "@/lib/content.functions";
-import { ArrowRight, ArrowUpRight, Award, Building2, CheckCircle2, ChevronRight, Cpu, HardHat, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { getPublishedSectors, getSiteSettings } from "@/lib/content.functions";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Award,
+  Building2,
+  CheckCircle2,
+  ChevronRight,
+  Cpu,
+  HardHat,
+  ShieldCheck,
+  Sparkles,
+  Wrench,
+} from "lucide-react";
 import heroImg from "@/assets/hero-industrial.jpg";
-import sectorElectrical from "@/assets/sector-electrical.jpg";
-import sectorEdile from "@/assets/sector-edile.jpg";
-import sectorMaintenance from "@/assets/sector-maintenance.jpg";
-import sectorDesign from "@/assets/sector-design.jpg";
 import teamImg from "@/assets/team.jpg";
 import ctaBg from "@/assets/cta-bg.jpg";
 import { SectionHeader } from "@/components/site/SectionHeader";
-import { sectors } from "@/data/sectors";
+import { toSectorViews } from "@/lib/sector-content";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Zicca Servizi — Impianti tecnologici civili e industriali · Milano · Torino" },
-      { name: "description", content: "Dal 1998 progettiamo, installiamo e gestiamo impianti tecnologici civili e industriali con edilizia integrata. Engineering certificato a Milano e Torino." },
+      {
+        name: "description",
+        content:
+          "Dal 1998 progettiamo, installiamo e gestiamo impianti tecnologici civili e industriali con edilizia integrata. Engineering certificato a Milano e Torino.",
+      },
       { property: "og:title", content: "Zicca Servizi — Engineering & Impianti" },
-      { property: "og:description", content: "Progettazione, installazione, manutenzione e gestione di impianti tecnologici civili e industriali." },
+      {
+        property: "og:description",
+        content:
+          "Progettazione, installazione, manutenzione e gestione di impianti tecnologici civili e industriali.",
+      },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
-    scripts: [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "Zicca Servizi S.r.l.",
-        url: "/",
-        foundingDate: "1998",
-        address: [
-          { "@type": "PostalAddress", streetAddress: "Via Civesio, 3", addressLocality: "San Donato Milanese", postalCode: "20097", addressCountry: "IT" },
-          { "@type": "PostalAddress", streetAddress: "Via Genova, 23", addressLocality: "Torino", postalCode: "10126", addressCountry: "IT" },
-        ],
-        telephone: "+39 02 55230921",
-        email: "info@ziccaservizi.it",
-      }),
-    }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Zicca Servizi S.r.l.",
+          url: "/",
+          foundingDate: "1998",
+          address: [
+            {
+              "@type": "PostalAddress",
+              streetAddress: "Via Civesio, 3",
+              addressLocality: "San Donato Milanese",
+              postalCode: "20097",
+              addressCountry: "IT",
+            },
+            {
+              "@type": "PostalAddress",
+              streetAddress: "Via Genova, 23",
+              addressLocality: "Torino",
+              postalCode: "10126",
+              addressCountry: "IT",
+            },
+          ],
+          telephone: "+39 02 55230921",
+          email: "info@ziccaservizi.it",
+        }),
+      },
+    ],
   }),
   component: HomePage,
 });
-
-const sectorImages = { electrical: sectorElectrical, edile: sectorEdile, maintenance: sectorMaintenance, design: sectorDesign } as const;
 
 function useCountUp(target: number, duration = 1800) {
   const [val, setVal] = useState(0);
@@ -55,22 +83,25 @@ function useCountUp(target: number, duration = 1800) {
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting && !started.current) {
-          started.current = true;
-          const start = performance.now();
-          const tick = (now: number) => {
-            const t = Math.min(1, (now - start) / duration);
-            const eased = 1 - Math.pow(1 - t, 3);
-            setVal(Math.floor(eased * target));
-            if (t < 1) requestAnimationFrame(tick);
-            else setVal(target);
-          };
-          requestAnimationFrame(tick);
-        }
-      });
-    }, { threshold: 0.4 });
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && !started.current) {
+            started.current = true;
+            const start = performance.now();
+            const tick = (now: number) => {
+              const t = Math.min(1, (now - start) / duration);
+              const eased = 1 - Math.pow(1 - t, 3);
+              setVal(Math.floor(eased * target));
+              if (t < 1) requestAnimationFrame(tick);
+              else setVal(target);
+            };
+            requestAnimationFrame(tick);
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
     obs.observe(node);
     return () => obs.disconnect();
   }, [target, duration]);
@@ -80,15 +111,28 @@ function useCountUp(target: number, duration = 1800) {
 function StatNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
   const { ref, val } = useCountUp(value);
   return (
-    <span ref={ref} className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-      {val}{suffix}
+    <span
+      ref={ref}
+      className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight"
+    >
+      {val}
+      {suffix}
     </span>
   );
 }
 
 function HomePage() {
   const fetchSettings = useServerFn(getSiteSettings);
-  const { data: settings } = useQuery({ queryKey: ["site-settings"], queryFn: () => fetchSettings() });
+  const { data: settings } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: () => fetchSettings(),
+  });
+  const fetchSectors = useServerFn(getPublishedSectors);
+  const { data: sectorsData } = useQuery({
+    queryKey: ["published-sectors"],
+    queryFn: () => fetchSectors(),
+  });
+  const sectors = toSectorViews(sectorsData);
   const videoUrl: string | undefined = settings?.hero?.video_url || undefined;
   const posterUrl: string = settings?.hero?.poster_url || heroImg;
   const [videoReady, setVideoReady] = useState(false);
@@ -140,22 +184,30 @@ function HomePage() {
               Engineering & impianti dal 1998
             </div>
             <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-tight text-balance">
-              <span className="block text-2xl sm:text-3xl md:text-4xl font-semibold text-white/90 mb-3 tracking-tight">Zicca Servizi SRL</span>
-              Progettiamo, installiamo<br />
-              e gestiamo <span className="text-gradient">impianti</span><br />
+              <span className="block text-2xl sm:text-3xl md:text-4xl font-semibold text-white/90 mb-3 tracking-tight">
+                Zicca Servizi SRL
+              </span>
+              Progettiamo, installiamo
+              <br />e gestiamo <span className="text-gradient">impianti</span>
+              <br />
               che fanno funzionare l'industria.
             </h1>
             <p className="mt-8 max-w-2xl text-lg md:text-xl text-white/80 leading-relaxed">
-              Impianti tecnologici civili e industriali con edilizia integrata.
-              Un partner unico, dalla progettazione alla manutenzione, con sedi
-              operative a Milano e Torino.
+              Impianti tecnologici civili e industriali con edilizia integrata. Un partner unico,
+              dalla progettazione alla manutenzione, con sedi operative a Milano e Torino.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <Link to="/contatti" className="group inline-flex items-center gap-2 rounded-full bg-electric text-electric-foreground px-7 py-4 text-base font-semibold transition-all hover:shadow-glow">
+              <Link
+                to="/contatti"
+                className="group inline-flex items-center gap-2 rounded-full bg-electric text-electric-foreground px-7 py-4 text-base font-semibold transition-all hover:shadow-glow"
+              >
                 Richiedi informazioni
                 <ArrowUpRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
-              <Link to="/azienda" className="group inline-flex items-center gap-2 rounded-full glass-dark text-white px-7 py-4 text-base font-semibold transition-all hover:bg-white/10">
+              <Link
+                to="/azienda"
+                className="group inline-flex items-center gap-2 rounded-full glass-dark text-white px-7 py-4 text-base font-semibold transition-all hover:bg-white/10"
+              >
                 Scopri l'azienda
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
@@ -187,7 +239,17 @@ function HomePage() {
         <div className="flex gap-16 animate-marquee whitespace-nowrap text-muted-foreground/70 font-display text-2xl md:text-3xl font-semibold">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex gap-16 shrink-0">
-              {["Engineering", "Impianti elettrici", "HVAC", "Antincendio", "Fotovoltaico", "Manutenzione 24/7", "Edilizia integrata", "BIM", "Efficientamento"].map((w) => (
+              {[
+                "Engineering",
+                "Impianti elettrici",
+                "HVAC",
+                "Antincendio",
+                "Fotovoltaico",
+                "Manutenzione 24/7",
+                "Edilizia integrata",
+                "BIM",
+                "Efficientamento",
+              ].map((w) => (
                 <span key={w} className="flex items-center gap-16">
                   {w} <span className="h-2 w-2 rounded-full bg-electric" />
                 </span>
@@ -216,7 +278,9 @@ function HomePage() {
             ].map((n) => (
               <div key={n.l} className="border-t-2 border-foreground pt-6">
                 <StatNumber value={n.v} suffix={n.s} />
-                <div className="mt-3 text-sm font-medium text-muted-foreground uppercase tracking-wider">{n.l}</div>
+                <div className="mt-3 text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                  {n.l}
+                </div>
               </div>
             ))}
           </div>
@@ -231,7 +295,10 @@ function HomePage() {
               eyebrow="Settori operativi"
               title="Quattro competenze, un unico interlocutore."
             />
-            <Link to="/settori" className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-electric transition-colors">
+            <Link
+              to="/settori"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-electric transition-colors"
+            >
               Tutti i settori <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
@@ -246,7 +313,7 @@ function HomePage() {
               >
                 <div className="aspect-[16/10] overflow-hidden bg-secondary">
                   <img
-                    src={sectorImages[s.image as keyof typeof sectorImages]}
+                    src={s.image}
                     alt={s.title}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -260,7 +327,9 @@ function HomePage() {
                       Scopri <ChevronRight className="h-3.5 w-3.5" />
                     </span>
                   </div>
-                  <h3 className="font-display text-2xl md:text-3xl font-bold leading-tight">{s.title}</h3>
+                  <h3 className="font-display text-2xl md:text-3xl font-bold leading-tight">
+                    {s.title}
+                  </h3>
                   <p className="mt-3 text-muted-foreground">{s.short}</p>
                 </div>
               </Link>
@@ -274,13 +343,20 @@ function HomePage() {
         <div className="grid lg:grid-cols-12 gap-16 items-center">
           <div className="lg:col-span-6">
             <div className="relative">
-              <img src={teamImg} alt="Team Zicca Servizi" loading="lazy" className="rounded-2xl shadow-elegant aspect-[4/3] object-cover w-full" />
+              <img
+                src={teamImg}
+                alt="Team Zicca Servizi"
+                loading="lazy"
+                className="rounded-2xl shadow-elegant aspect-[4/3] object-cover w-full"
+              />
               <div className="absolute -bottom-8 -right-4 md:-right-8 glass rounded-2xl p-6 shadow-elegant max-w-xs">
                 <div className="flex items-center gap-3 mb-2">
                   <Award className="h-5 w-5 text-electric" />
                   <span className="text-xs uppercase tracking-[0.2em] font-semibold">Dal 1998</span>
                 </div>
-                <p className="text-sm font-medium leading-snug">Un team multidisciplinare di oltre 60 specialisti, civili e industriali.</p>
+                <p className="text-sm font-medium leading-snug">
+                  Un team multidisciplinare di oltre 60 specialisti, civili e industriali.
+                </p>
               </div>
             </div>
           </div>
@@ -292,10 +368,26 @@ function HomePage() {
             />
             <div className="mt-10 grid sm:grid-cols-2 gap-6">
               {[
-                { i: Cpu, t: "Progettazione integrata", d: "Studio tecnico interno, modellazione BIM e scelta delle tecnologie." },
-                { i: HardHat, t: "Esecuzione certificata", d: "Squadre specializzate civili e industriali con direzione lavori." },
-                { i: Wrench, t: "Manutenzione continua", d: "Conduzione e pronto intervento 24/7 con reportistica digitale." },
-                { i: ShieldCheck, t: "Qualità garantita", d: "ISO 9001, SOA, ICIM e procedure interne sempre verificate." },
+                {
+                  i: Cpu,
+                  t: "Progettazione integrata",
+                  d: "Studio tecnico interno, modellazione BIM e scelta delle tecnologie.",
+                },
+                {
+                  i: HardHat,
+                  t: "Esecuzione certificata",
+                  d: "Squadre specializzate civili e industriali con direzione lavori.",
+                },
+                {
+                  i: Wrench,
+                  t: "Manutenzione continua",
+                  d: "Conduzione e pronto intervento 24/7 con reportistica digitale.",
+                },
+                {
+                  i: ShieldCheck,
+                  t: "Qualità garantita",
+                  d: "ISO 9001, SOA, ICIM e procedure interne sempre verificate.",
+                },
               ].map(({ i: Icon, t, d }) => (
                 <div key={t} className="group">
                   <div className="flex items-center gap-3 mb-2">
@@ -319,7 +411,9 @@ function HomePage() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-8 bg-electric" />
-              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-electric">La nostra storia</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-electric">
+                La nostra storia
+              </span>
             </div>
             <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               Un percorso costruito su <span className="text-gradient">fiducia e competenza</span>.
@@ -329,10 +423,26 @@ function HomePage() {
           <div className="mt-20 grid md:grid-cols-4 gap-8 relative">
             <div className="absolute left-0 right-0 top-6 h-px bg-white/10 hidden md:block" />
             {[
-              { y: "1998", t: "Fondazione", d: "Lucio Zicca avvia l'attività come ditta individuale nel settore civile." },
-              { y: "2006", t: "Espansione industriale", d: "Entra in azienda Agostino Zicca, perito industriale e Direttore tecnico." },
-              { y: "2011", t: "Nasce la S.r.l.", d: "Costituzione di Zicca Servizi S.r.l. con la struttura attuale." },
-              { y: "Oggi", t: "Engineering & impianti", d: "60+ professionisti, sedi a Milano e Torino, cantieri in tutta Italia." },
+              {
+                y: "1998",
+                t: "Fondazione",
+                d: "Lucio Zicca avvia l'attività come ditta individuale nel settore civile.",
+              },
+              {
+                y: "2006",
+                t: "Espansione industriale",
+                d: "Entra in azienda Agostino Zicca, perito industriale e Direttore tecnico.",
+              },
+              {
+                y: "2011",
+                t: "Nasce la S.r.l.",
+                d: "Costituzione di Zicca Servizi S.r.l. con la struttura attuale.",
+              },
+              {
+                y: "Oggi",
+                t: "Engineering & impianti",
+                d: "60+ professionisti, sedi a Milano e Torino, cantieri in tutta Italia.",
+              },
             ].map((m) => (
               <div key={m.y} className="relative">
                 <div className="h-3 w-3 rounded-full bg-electric mb-6 ring-4 ring-electric/20" />
@@ -354,9 +464,21 @@ function HomePage() {
         />
         <div className="mt-16 grid md:grid-cols-3 gap-6">
           {[
-            { q: "Una azienda seria, molto professionale ed affidabile. Ho avuto più di una esperienza diretta ed in tutti i casi ho avuto conferma delle qualità indicate.", a: "Sergio Brega", s: "Cliente industriale" },
-            { q: "Gente seria. Personale esperto e affidabile. Lavorano con grande attenzione ai dettagli e rispetto delle tempistiche.", a: "Riccardo Monica", s: "Committente privato" },
-            { q: "Professionalità e cortesia. Un partner affidabile per la manutenzione dei nostri impianti, sempre presente quando serve.", a: "Angelo Ballabaio", s: "Property manager" },
+            {
+              q: "Una azienda seria, molto professionale ed affidabile. Ho avuto più di una esperienza diretta ed in tutti i casi ho avuto conferma delle qualità indicate.",
+              a: "Sergio Brega",
+              s: "Cliente industriale",
+            },
+            {
+              q: "Gente seria. Personale esperto e affidabile. Lavorano con grande attenzione ai dettagli e rispetto delle tempistiche.",
+              a: "Riccardo Monica",
+              s: "Committente privato",
+            },
+            {
+              q: "Professionalità e cortesia. Un partner affidabile per la manutenzione dei nostri impianti, sempre presente quando serve.",
+              a: "Angelo Ballabaio",
+              s: "Property manager",
+            },
           ].map((t) => (
             <div key={t.a} className="bg-card border border-border rounded-2xl p-8 hover-lift">
               <Sparkles className="h-6 w-6 text-electric mb-6" />
@@ -375,11 +497,26 @@ function HomePage() {
         <div className="container-px mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-5">
-              <SectionHeader eyebrow="Certificazioni" title="Standard riconosciuti, qualità garantita." />
+              <SectionHeader
+                eyebrow="Certificazioni"
+                title="Standard riconosciuti, qualità garantita."
+              />
             </div>
             <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {["ISO 9001", "ISO 14001", "ISO 45001", "SOA OG11", "SOA OS28", "SOA OS30", "ICIM", "F-Gas"].map((c) => (
-                <div key={c} className="aspect-square flex flex-col items-center justify-center rounded-xl border border-border bg-card hover-lift">
+              {[
+                "ISO 9001",
+                "ISO 14001",
+                "ISO 45001",
+                "SOA OG11",
+                "SOA OS28",
+                "SOA OS30",
+                "ICIM",
+                "F-Gas",
+              ].map((c) => (
+                <div
+                  key={c}
+                  className="aspect-square flex flex-col items-center justify-center rounded-xl border border-border bg-card hover-lift"
+                >
                   <CheckCircle2 className="h-6 w-6 text-electric mb-2" />
                   <span className="font-display font-bold text-sm">{c}</span>
                 </div>
@@ -387,7 +524,10 @@ function HomePage() {
             </div>
           </div>
           <div className="mt-10">
-            <Link to="/certificazioni" className="inline-flex items-center gap-2 text-sm font-semibold hover:text-electric transition-colors">
+            <Link
+              to="/certificazioni"
+              className="inline-flex items-center gap-2 text-sm font-semibold hover:text-electric transition-colors"
+            >
               Vedi tutte le certificazioni <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
@@ -396,24 +536,36 @@ function HomePage() {
 
       {/* CTA */}
       <section className="relative overflow-hidden">
-        <img src={ctaBg} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={ctaBg}
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-ink/85" />
         <div className="relative container-px mx-auto max-w-7xl py-24 md:py-32 text-ink-foreground">
           <div className="max-w-3xl">
             <Building2 className="h-10 w-10 text-electric mb-6" />
             <h2 className="font-display text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-              Hai un progetto impiantistico?<br />
+              Hai un progetto impiantistico?
+              <br />
               <span className="text-gradient">Parliamone.</span>
             </h2>
             <p className="mt-6 text-lg text-white/80 max-w-2xl">
-              Che si tratti di un nuovo cantiere, di una ristrutturazione o di
-              un contratto di manutenzione, il nostro team è pronto ad ascoltarti.
+              Che si tratti di un nuovo cantiere, di una ristrutturazione o di un contratto di
+              manutenzione, il nostro team è pronto ad ascoltarti.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <Link to="/contatti" className="inline-flex items-center gap-2 rounded-full bg-electric text-electric-foreground px-7 py-4 text-base font-semibold hover:shadow-glow transition-all">
+              <Link
+                to="/contatti"
+                className="inline-flex items-center gap-2 rounded-full bg-electric text-electric-foreground px-7 py-4 text-base font-semibold hover:shadow-glow transition-all"
+              >
                 Richiedi un sopralluogo <ArrowUpRight className="h-5 w-5" />
               </Link>
-              <a href="tel:0255230921" className="inline-flex items-center gap-2 rounded-full glass-dark text-white px-7 py-4 text-base font-semibold hover:bg-white/10 transition-all">
+              <a
+                href="tel:0255230921"
+                className="inline-flex items-center gap-2 rounded-full glass-dark text-white px-7 py-4 text-base font-semibold hover:bg-white/10 transition-all"
+              >
                 Chiama 02 55230921
               </a>
             </div>

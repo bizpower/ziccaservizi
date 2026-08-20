@@ -45,9 +45,18 @@ export function MediaUpload({
         {value ? (
           <div className="relative inline-block">
             {accept.includes("image") ? (
-              <img src={value} alt="" className="h-32 w-48 object-cover rounded-md border border-border" />
+              <img
+                src={value}
+                alt=""
+                className="h-32 w-48 object-cover rounded-md border border-border"
+              />
             ) : (
-              <a href={value} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 rounded-md border border-border text-sm hover:bg-muted">
+              <a
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block px-4 py-2 rounded-md border border-border text-sm hover:bg-muted"
+              >
                 Apri file caricato →
               </a>
             )}

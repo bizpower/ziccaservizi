@@ -130,7 +130,11 @@ export const upsertSiteSetting = createServerFn({ method: "POST" })
 
 const sectorInput = z.object({
   id: z.string().uuid().optional(),
-  slug: z.string().min(1).max(120).regex(/^[a-z0-9-]+$/),
+  slug: z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9-]+$/),
   title: z.string().min(1).max(200),
   tagline: z.string().max(300).nullable().optional(),
   description: z.string().max(4000).nullable().optional(),
@@ -331,7 +335,15 @@ export const PAGE_LOCATIONS = [
 
 export const getCustomSectionsByPage = createServerFn({ method: "GET" })
   .inputValidator((d: { page: string }) =>
-    z.object({ page: z.string().min(1).max(40).regex(/^[a-z0-9_-]+$/) }).parse(d),
+    z
+      .object({
+        page: z
+          .string()
+          .min(1)
+          .max(40)
+          .regex(/^[a-z0-9_-]+$/),
+      })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabaseAdmin
@@ -346,7 +358,11 @@ export const getCustomSectionsByPage = createServerFn({ method: "GET" })
 
 const customSectionInput = z.object({
   id: z.string().uuid().optional(),
-  page_location: z.string().min(1).max(40).regex(/^[a-z0-9_-]+$/),
+  page_location: z
+    .string()
+    .min(1)
+    .max(40)
+    .regex(/^[a-z0-9_-]+$/),
   eyebrow: z.string().max(120).nullable().optional(),
   title: z.string().min(1).max(240),
   heading_level: z.number().int().min(2).max(4).default(2),

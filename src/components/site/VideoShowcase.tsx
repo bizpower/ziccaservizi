@@ -21,11 +21,36 @@ type Item = {
 };
 
 const allItems: Item[] = [
-  { title: "Capo ti segue", description: "Il nostro modo di stare in cantiere: il capo guida, la squadra segue.", video: capoVid.url, poster: capoPoster.url },
-  { title: "Ca' Granda: la spiegazione", description: "Un intervento tecnico raccontato passo passo dal team Zicca Servizi.", video: caGrandaVid.url, poster: caGrandaPoster.url },
-  { title: "Qualche modo", description: "Soluzioni impiantistiche pensate per risolvere, non per rimandare.", video: qualcheVid.url, poster: qualchePoster.url },
-  { title: "Sgarro", description: "Attenzione al dettaglio: perché anche il piccolo sgarro fa la differenza.", video: sgarroVid.url, poster: sgarroPoster.url },
-  { title: "Revamping", description: "Rinnoviamo impianti esistenti restituendo efficienza e sicurezza.", video: revampingVid.url, poster: revampingPoster.url },
+  {
+    title: "Capo ti segue",
+    description: "Il nostro modo di stare in cantiere: il capo guida, la squadra segue.",
+    video: capoVid.url,
+    poster: capoPoster.url,
+  },
+  {
+    title: "Ca' Granda: la spiegazione",
+    description: "Un intervento tecnico raccontato passo passo dal team Zicca Servizi.",
+    video: caGrandaVid.url,
+    poster: caGrandaPoster.url,
+  },
+  {
+    title: "Qualche modo",
+    description: "Soluzioni impiantistiche pensate per risolvere, non per rimandare.",
+    video: qualcheVid.url,
+    poster: qualchePoster.url,
+  },
+  {
+    title: "Sgarro",
+    description: "Attenzione al dettaglio: perché anche il piccolo sgarro fa la differenza.",
+    video: sgarroVid.url,
+    poster: sgarroPoster.url,
+  },
+  {
+    title: "Revamping",
+    description: "Rinnoviamo impianti esistenti restituendo efficienza e sicurezza.",
+    video: revampingVid.url,
+    poster: revampingPoster.url,
+  },
 ];
 
 // I video sono ospitati esternamente (vedi src/assets/**/*.asset.json):
@@ -41,14 +66,17 @@ export function VideoShowcase() {
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return;
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      });
-    }, { rootMargin: "200px" });
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setVisible(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { rootMargin: "200px" },
+    );
     obs.observe(node);
     return () => obs.disconnect();
   }, []);
@@ -79,7 +107,11 @@ export function VideoShowcase() {
   if (items.length === 0) return null;
 
   return (
-    <section ref={sectionRef} aria-labelledby="video-showcase-heading" className="py-24 md:py-32 bg-secondary">
+    <section
+      ref={sectionRef}
+      aria-labelledby="video-showcase-heading"
+      className="py-24 md:py-32 bg-secondary"
+    >
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -107,7 +139,9 @@ export function VideoShowcase() {
               >
                 <div className="relative aspect-[9/16] overflow-hidden rounded-3xl bg-ink shadow-[0_10px_30px_-12px_rgba(15,23,42,0.25)] hover:shadow-[0_24px_50px_-18px_rgba(42,164,203,0.4)] hover:-translate-y-1 transition-all duration-300 ring-1 ring-border/60">
                   <video
-                    ref={(el) => { videoRefs.current[idx] = el; }}
+                    ref={(el) => {
+                      videoRefs.current[idx] = el;
+                    }}
                     src={visible ? it.video : undefined}
                     poster={it.poster}
                     preload="none"

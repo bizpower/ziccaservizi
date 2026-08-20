@@ -5,18 +5,18 @@
 Tutte le immagini del progetto originale sono state trasferite e verificate
 byte per byte (md5 identico all'originale Lovable):
 
-| Percorso | Dimensioni | Byte | md5 |
-| --- | --- | --- | --- |
-| `public/logo-zicca.png` | PNG 283×84 | 25.756 | d74c9492e4049fa522585938baa3924d |
-| `public/favicon.png` | PNG 283×84 | 25.756 | d74c9492e4049fa522585938baa3924d |
-| `public/milano-united/logo.png` | PNG 640×640 | 344.356 | 0fac686073fd2468c6802df8718fd9f5 |
-| `src/assets/hero-industrial.jpg` | JPEG 1920×1080 | 245.896 | a4a0f3a395f5f1c446c248545851da02 |
-| `src/assets/cta-bg.jpg` | JPEG 1920×1080 | 298.871 | 43431d3dc0faa8e38aca5fe3d6ed02ac |
-| `src/assets/sector-electrical.jpg` | JPEG 1280×960 | 104.408 | 62b1847b3a03a4a141931cd325c660b9 |
-| `src/assets/sector-edile.jpg` | JPEG 1280×960 | 226.101 | 4a4a61393ce272054794c40c228235c9 |
-| `src/assets/sector-maintenance.jpg` | JPEG 1280×960 | 112.390 | 110aee27a73f1108d60afa6c94314343 |
-| `src/assets/sector-design.jpg` | JPEG 1280×960 | 142.789 | ccff826c975e725ec58769b181a2b0a6 |
-| `src/assets/team.jpg` | JPEG 1600×1000 | 186.390 | d905036350c4dc39427ca11fa48cdc40 |
+| Percorso                            | Dimensioni     | Byte    | md5                              |
+| ----------------------------------- | -------------- | ------- | -------------------------------- |
+| `public/logo-zicca.png`             | PNG 283×84     | 25.756  | d74c9492e4049fa522585938baa3924d |
+| `public/favicon.png`                | PNG 283×84     | 25.756  | d74c9492e4049fa522585938baa3924d |
+| `public/milano-united/logo.png`     | PNG 640×640    | 344.356 | 0fac686073fd2468c6802df8718fd9f5 |
+| `src/assets/hero-industrial.jpg`    | JPEG 1920×1080 | 245.896 | a4a0f3a395f5f1c446c248545851da02 |
+| `src/assets/cta-bg.jpg`             | JPEG 1920×1080 | 298.871 | 43431d3dc0faa8e38aca5fe3d6ed02ac |
+| `src/assets/sector-electrical.jpg`  | JPEG 1280×960  | 104.408 | 62b1847b3a03a4a141931cd325c660b9 |
+| `src/assets/sector-edile.jpg`       | JPEG 1280×960  | 226.101 | 4a4a61393ce272054794c40c228235c9 |
+| `src/assets/sector-maintenance.jpg` | JPEG 1280×960  | 112.390 | 110aee27a73f1108d60afa6c94314343 |
+| `src/assets/sector-design.jpg`      | JPEG 1280×960  | 142.789 | ccff826c975e725ec58769b181a2b0a6 |
+| `src/assets/team.jpg`               | JPEG 1600×1000 | 186.390 | d905036350c4dc39427ca11fa48cdc40 |
 
 Restano da trasferire solo i **video** (punto 2).
 
@@ -31,16 +31,16 @@ Non è stato possibile trasferirli automaticamente per due motivi:
 - pesano complessivamente ~430 MB: non possono stare nel repository e vanno
   caricati su storage esterno.
 
-| File | Dimensione | Poster |
-| --- | --- | --- |
-| `capo-ti-segue-web.mp4` | 44,6 MB | 227 KB |
-| `ca-granda-spiegazione-web.mp4` | 77,5 MB | 477 KB |
-| `qualche-modo-web.mp4` | 26,9 MB | 210 KB |
-| `sgarro-web.mp4` | 19,8 MB | 182 KB |
-| `revamping-web.mp4` | 78,7 MB | 350 KB |
-| `tata-parla.mp4` (Milano United) | 50,6 MB | 94 KB |
-| `challenge-2.mp4` (Milano United) | 37,9 MB | 59 KB |
-| `vero-calcio.mp4` (Milano United) | 42,2 MB | 105 KB |
+| File                              | Dimensione | Poster |
+| --------------------------------- | ---------- | ------ |
+| `capo-ti-segue-web.mp4`           | 44,6 MB    | 227 KB |
+| `ca-granda-spiegazione-web.mp4`   | 77,5 MB    | 477 KB |
+| `qualche-modo-web.mp4`            | 26,9 MB    | 210 KB |
+| `sgarro-web.mp4`                  | 19,8 MB    | 182 KB |
+| `revamping-web.mp4`               | 78,7 MB    | 350 KB |
+| `tata-parla.mp4` (Milano United)  | 50,6 MB    | 94 KB  |
+| `challenge-2.mp4` (Milano United) | 37,9 MB    | 59 KB  |
+| `vero-calcio.mp4` (Milano United) | 42,2 MB    | 105 KB |
 
 ### Attenzione al limite di 50 MB
 

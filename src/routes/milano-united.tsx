@@ -12,9 +12,24 @@ import veroPoster from "@/assets/milano-united/vero-calcio-poster.jpg.asset.json
 type VItem = { title: string; description: string; video: string; poster: string };
 
 const allVideos: VItem[] = [
-  { title: "Tata parla", description: "Milano United: parole a bordo campo dal nostro Tata.", video: tataVid.url, poster: tataPoster.url },
-  { title: "Challenge #2", description: "La seconda challenge della squadra Milano United.", video: challVid.url, poster: challPoster.url },
-  { title: "Qual è il vero calcio", description: "Milano United racconta cosa significa per noi il calcio a 11.", video: veroVid.url, poster: veroPoster.url },
+  {
+    title: "Tata parla",
+    description: "Milano United: parole a bordo campo dal nostro Tata.",
+    video: tataVid.url,
+    poster: tataPoster.url,
+  },
+  {
+    title: "Challenge #2",
+    description: "La seconda challenge della squadra Milano United.",
+    video: challVid.url,
+    poster: challPoster.url,
+  },
+  {
+    title: "Qual è il vero calcio",
+    description: "Milano United racconta cosa significa per noi il calcio a 11.",
+    video: veroVid.url,
+    poster: veroPoster.url,
+  },
 ];
 
 // I video sono ospitati esternamente (vedi src/assets/milano-united/*.asset.json):
@@ -112,9 +127,20 @@ export const Route = createFileRoute("/milano-united")({
     return {
       meta: [
         { title: "Milano United | Squadra Calcio a 11 Zicca Servizi Milano" },
-        { name: "description", content: "Scopri Milano United, la squadra di calcio a 11 di Zicca Servizi: rosa, formazione e video highlights del campionato Sportland Serie B1 a Milano." },
-        { property: "og:title", content: "Milano United — La squadra di calcio a 11 di Zicca Servizi" },
-        { property: "og:description", content: "Rosa, formazione e video highlights di Milano United, Campionato Sportland Serie B1 Milano." },
+        {
+          name: "description",
+          content:
+            "Scopri Milano United, la squadra di calcio a 11 di Zicca Servizi: rosa, formazione e video highlights del campionato Sportland Serie B1 a Milano.",
+        },
+        {
+          property: "og:title",
+          content: "Milano United — La squadra di calcio a 11 di Zicca Servizi",
+        },
+        {
+          property: "og:description",
+          content:
+            "Rosa, formazione e video highlights di Milano United, Campionato Sportland Serie B1 Milano.",
+        },
         { property: "og:type", content: "website" },
         { property: "og:url", content: "/milano-united" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -133,7 +159,9 @@ export const Route = createFileRoute("/milano-united")({
 function PlayerCard({ p, size = "md" }: { p: Player; size?: "sm" | "md" }) {
   const isSm = size === "sm";
   return (
-    <div className={`group flex flex-col items-center text-center transition-transform duration-200 hover:-translate-y-0.5 ${isSm ? "" : "hover:scale-[1.03]"}`}>
+    <div
+      className={`group flex flex-col items-center text-center transition-transform duration-200 hover:-translate-y-0.5 ${isSm ? "" : "hover:scale-[1.03]"}`}
+    >
       <div className="relative">
         <div
           className={`grid place-items-center rounded-full text-white font-bold shadow-lg ring-2 ring-white/90 ${isSm ? "h-12 w-12 text-base" : "h-16 w-16 md:h-20 md:w-20 text-xl md:text-2xl"}`}
@@ -150,10 +178,14 @@ function PlayerCard({ p, size = "md" }: { p: Player; size?: "sm" | "md" }) {
           {p.n}
         </div>
       </div>
-      <div className={`mt-2 leading-tight ${isSm ? "text-[11px]" : "text-xs md:text-sm"} font-semibold text-white drop-shadow`}>
+      <div
+        className={`mt-2 leading-tight ${isSm ? "text-[11px]" : "text-xs md:text-sm"} font-semibold text-white drop-shadow`}
+      >
         {p.name}
       </div>
-      <div className={`${isSm ? "text-[10px]" : "text-[11px]"} uppercase tracking-wider text-white/70`}>
+      <div
+        className={`${isSm ? "text-[10px]" : "text-[11px]"} uppercase tracking-wider text-white/70`}
+      >
         {roleLabel[p.role]}
       </div>
     </div>
@@ -179,14 +211,17 @@ function MilanoUnitedPage() {
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return;
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      });
-    }, { rootMargin: "200px" });
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setVisible(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { rootMargin: "200px" },
+    );
     obs.observe(node);
     return () => obs.disconnect();
   }, []);
@@ -206,7 +241,9 @@ function MilanoUnitedPage() {
       {/* HERO */}
       <section
         className="relative pt-28 pb-20 md:pt-40 md:pb-28 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-primary-dark) 100%)" }}
+        style={{
+          background: "linear-gradient(135deg, var(--mu-primary) 0%, var(--mu-primary-dark) 100%)",
+        }}
       >
         <div className="absolute inset-0 opacity-20 grid-lines pointer-events-none" />
         <div className="container-px mx-auto max-w-5xl relative text-center text-white">
@@ -222,8 +259,8 @@ function MilanoUnitedPage() {
           </h1>
           <p className="mt-6 text-base md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed text-balance">
             Milano United è la squadra di calcio a 11 targata Zicca Servizi, iscritta al Campionato
-            Calcio a 11 Sportland Milano (Serie B1). Passione, sport e spirito di squadra: gli stessi
-            valori che mettiamo ogni giorno nel nostro lavoro.
+            Calcio a 11 Sportland Milano (Serie B1). Passione, sport e spirito di squadra: gli
+            stessi valori che mettiamo ogni giorno nel nostro lavoro.
           </p>
         </div>
       </section>
@@ -234,9 +271,17 @@ function MilanoUnitedPage() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-8" style={{ background: "var(--mu-primary)" }} />
-              <span className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--mu-primary)" }}>Video</span>
+              <span
+                className="text-xs font-semibold uppercase tracking-[0.22em]"
+                style={{ color: "var(--mu-primary)" }}
+              >
+                Video
+              </span>
             </div>
-            <h2 id="mu-videos" className="font-display text-3xl md:text-5xl font-bold tracking-tight text-balance">
+            <h2
+              id="mu-videos"
+              className="font-display text-3xl md:text-5xl font-bold tracking-tight text-balance"
+            >
               I nostri highlights
             </h2>
             <p className="mt-4 text-muted-foreground text-balance">
@@ -248,10 +293,15 @@ function MilanoUnitedPage() {
             {videos.map((it, idx) => {
               const isPlaying = playing === idx;
               return (
-                <div key={it.title} className="group snap-center shrink-0 w-[78%] sm:w-auto flex flex-col">
+                <div
+                  key={it.title}
+                  className="group snap-center shrink-0 w-[78%] sm:w-auto flex flex-col"
+                >
                   <div className="relative aspect-[9/16] overflow-hidden rounded-3xl bg-ink shadow-[0_10px_30px_-12px_rgba(15,23,42,0.25)] hover:shadow-[0_24px_50px_-18px_rgba(42,164,203,0.4)] hover:-translate-y-1 transition-all duration-300 ring-1 ring-border/60">
                     <video
-                      ref={(el) => { videoRefs.current[idx] = el; }}
+                      ref={(el) => {
+                        videoRefs.current[idx] = el;
+                      }}
                       src={visible ? it.video : undefined}
                       poster={it.poster}
                       preload="none"
@@ -272,7 +322,10 @@ function MilanoUnitedPage() {
                       >
                         <span
                           className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full text-white shadow-glow transition-transform duration-300 group-hover:scale-110"
-                          style={{ background: "linear-gradient(135deg, var(--mu-primary), var(--mu-primary-dark))" }}
+                          style={{
+                            background:
+                              "linear-gradient(135deg, var(--mu-primary), var(--mu-primary-dark))",
+                          }}
                         >
                           <Play className="h-7 w-7 md:h-8 md:w-8 ml-1" fill="currentColor" />
                         </span>
@@ -282,7 +335,10 @@ function MilanoUnitedPage() {
                   <h3 className="mt-4 font-display font-bold text-lg text-foreground leading-snug">
                     <span
                       className="inline-block h-1 w-6 mr-2 align-middle rounded-full"
-                      style={{ background: "linear-gradient(90deg, var(--mu-primary), var(--mu-primary-dark))" }}
+                      style={{
+                        background:
+                          "linear-gradient(90deg, var(--mu-primary), var(--mu-primary-dark))",
+                      }}
                       aria-hidden="true"
                     />
                     {it.title}
@@ -300,9 +356,17 @@ function MilanoUnitedPage() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="h-px w-8" style={{ background: "var(--mu-primary)" }} />
-              <span className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--mu-primary)" }}>La rosa</span>
+              <span
+                className="text-xs font-semibold uppercase tracking-[0.22em]"
+                style={{ color: "var(--mu-primary)" }}
+              >
+                La rosa
+              </span>
             </div>
-            <h2 id="mu-rosa" className="font-display text-3xl md:text-5xl font-bold tracking-tight text-balance">
+            <h2
+              id="mu-rosa"
+              className="font-display text-3xl md:text-5xl font-bold tracking-tight text-balance"
+            >
               Formazione titolare — Modulo 4-4-2
             </h2>
           </div>
@@ -312,7 +376,8 @@ function MilanoUnitedPage() {
             <div
               className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-elegant ring-1 ring-black/10"
               style={{
-                background: "linear-gradient(180deg, var(--mu-field-top) 0%, var(--mu-field-bottom) 100%)",
+                background:
+                  "linear-gradient(180deg, var(--mu-field-top) 0%, var(--mu-field-bottom) 100%)",
               }}
               aria-label="Campo da calcio con formazione 4-4-2 di Milano United"
             >
@@ -323,23 +388,81 @@ function MilanoUnitedPage() {
                 preserveAspectRatio="none"
                 aria-hidden="true"
               >
-                <rect x="8" y="8" width="284" height="384" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
-                <line x1="8" y1="200" x2="292" y2="200" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
-                <circle cx="150" cy="200" r="42" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
+                <rect
+                  x="8"
+                  y="8"
+                  width="284"
+                  height="384"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="8"
+                  y1="200"
+                  x2="292"
+                  y2="200"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
+                <circle
+                  cx="150"
+                  cy="200"
+                  r="42"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
                 <circle cx="150" cy="200" r="2.5" fill="rgba(255,255,255,0.8)" />
                 {/* Aree */}
-                <rect x="70" y="8" width="160" height="52" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
-                <rect x="105" y="8" width="90" height="22" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
-                <rect x="70" y="340" width="160" height="52" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
-                <rect x="105" y="370" width="90" height="22" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
+                <rect
+                  x="70"
+                  y="8"
+                  width="160"
+                  height="52"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="105"
+                  y="8"
+                  width="90"
+                  height="22"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="70"
+                  y="340"
+                  width="160"
+                  height="52"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="105"
+                  y="370"
+                  width="90"
+                  height="22"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.55)"
+                  strokeWidth="2"
+                />
               </svg>
 
               {/* Players layout */}
               <div className="absolute inset-0 flex flex-col justify-between py-6 md:py-10">
-                <div className="pt-2"><FormationRow players={starters.ATT} /></div>
+                <div className="pt-2">
+                  <FormationRow players={starters.ATT} />
+                </div>
                 <FormationRow players={starters.CEN} />
                 <FormationRow players={starters.DIF} />
-                <div className="pb-2"><FormationRow players={starters.POR} /></div>
+                <div className="pb-2">
+                  <FormationRow players={starters.POR} />
+                </div>
               </div>
             </div>
           </div>
@@ -351,7 +474,11 @@ function MilanoUnitedPage() {
             </h3>
             <div
               className="mt-8 grid gap-6 rounded-3xl p-6 md:p-8"
-              style={{ background: "linear-gradient(135deg, var(--mu-field-top) 0%, var(--mu-field-bottom) 100%)", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))" }}
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--mu-field-top) 0%, var(--mu-field-bottom) 100%)",
+                gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+              }}
             >
               {bench.map((p) => (
                 <PlayerCard key={p.n} p={p} size="sm" />
@@ -361,7 +488,9 @@ function MilanoUnitedPage() {
 
           {/* Staff */}
           <div className="mt-16 max-w-3xl mx-auto">
-            <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-center">Staff tecnico</h3>
+            <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-center">
+              Staff tecnico
+            </h3>
             <div className="mt-8 grid gap-6 sm:grid-cols-2">
               {staff.map((s) => (
                 <div
@@ -377,7 +506,9 @@ function MilanoUnitedPage() {
                     {initials(s.name)}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-display font-bold text-lg leading-tight truncate">{s.name}</div>
+                    <div className="font-display font-bold text-lg leading-tight truncate">
+                      {s.name}
+                    </div>
                     <div className="text-sm text-muted-foreground">{s.role}</div>
                   </div>
                 </div>

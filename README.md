@@ -6,13 +6,13 @@ deployato senza alcuna dipendenza dalla piattaforma Lovable.
 
 ## Stack
 
-| Ambito | Tecnologia |
-| --- | --- |
+| Ambito    | Tecnologia                                       |
+| --------- | ------------------------------------------------ |
 | Framework | TanStack Start (React 19 + TanStack Router, SSR) |
-| Build | Vite 7 |
-| Stili | Tailwind CSS 4 + shadcn/ui (`components.json`) |
-| Backend | Supabase (Postgres + Auth + Storage) |
-| Deploy | Vercel (build Nitro, Build Output API) |
+| Build     | Vite 7                                           |
+| Stili     | Tailwind CSS 4 + shadcn/ui (`components.json`)   |
+| Backend   | Supabase (Postgres + Auth + Storage)             |
+| Deploy    | Vercel (build Nitro, Build Output API)           |
 
 ## Struttura
 
@@ -42,9 +42,9 @@ npm run dev               # http://localhost:8080
 
 ## Variabili d'ambiente
 
-Vedi `.env.example`. In produzione vanno impostate come secret della piattaforma
-di hosting (per Cloudflare: `wrangler secret put <NOME>`); le `VITE_*` sono
-inserite nel bundle a build time, quindi devono essere presenti anche in fase di build.
+Vedi `.env.example`. In produzione vanno impostate tra le Environment Variables
+del progetto Vercel; le `VITE_*` sono inserite nel bundle a build time, quindi
+devono essere presenti anche in fase di build.
 
 `SUPABASE_SERVICE_ROLE_KEY` è usata **solo** lato server (`client.server.ts`) e
 non deve mai finire nel bundle client.
@@ -96,6 +96,21 @@ Il dominio del cliente si collega poi da Vercel → Project → Domains.
 Per cambiare piattaforma basta il preset Nitro corrispondente
 (`NITRO_PRESET=cloudflare_module`, `netlify`, `node-server`, ecc.).
 
+## Contenuti gestiti dal pannello
+
+Settori, referenze e certificazioni sono letti dal database (tabelle `zicca.*`,
+gestite da `/admin`) e ricadono sull'elenco statico presente nel codice quando
+la tabella è vuota o il database non risponde: il sito non resta mai spoglio e
+non va in errore per un problema di connessione al database.
+
+| Pagina | Sorgente dinamica | Fallback |
+| --- | --- | --- |
+| Home + `/settori` + `/settori/$slug` | `zicca.sectors` | `src/data/sectors.ts` |
+| `/referenze` | `zicca.projects` (righe con immagine) | elenco in `src/routes/referenze.tsx` |
+| `/certificazioni` | `zicca.certifications` | elenco in `src/routes/certificazioni.tsx` |
+| Blocchi liberi su tutte le pagine | `zicca.custom_sections` | nessuno (sezione assente) |
+| Video/poster hero della home | `zicca.site_settings` → `hero` | immagine `hero-industrial.jpg` |
+
 ## Media
 
 Le immagini originali (logo, favicon, foto hero/settori/team, logo Milano
@@ -106,6 +121,7 @@ vuoto e finché resta tale le sezioni video non vengono mostrate. Dettagli in
 
 ## Stato della migrazione
 
+Per la messa online e il passaggio al cliente vedi **`CONSEGNA.md`**.
 Da completare, con le procedure già pronte:
 
 - **Video** → `MEDIA.md`: caricarli su `zicca-media` e compilare i manifest

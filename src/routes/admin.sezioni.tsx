@@ -107,8 +107,8 @@ function AdminCustomSections() {
         <div>
           <h1 className="font-display text-3xl font-bold">Sezioni personalizzate</h1>
           <p className="text-muted-foreground mt-1 max-w-2xl">
-            Aggiungi blocchi di contenuto liberi (testo, immagine, pulsante) a qualsiasi pagina del sito.
-            Scegli la pagina, l'ordine e lo stile.
+            Aggiungi blocchi di contenuto liberi (testo, immagine, pulsante) a qualsiasi pagina del
+            sito. Scegli la pagina, l'ordine e lo stile.
           </p>
         </div>
         <button
@@ -137,9 +137,16 @@ function AdminCustomSections() {
                 </h2>
                 <div className="grid gap-3">
                   {items.map((s: any) => (
-                    <div key={s.id} className="rounded-xl border border-border bg-card p-4 flex items-center gap-4">
+                    <div
+                      key={s.id}
+                      className="rounded-xl border border-border bg-card p-4 flex items-center gap-4"
+                    >
                       {s.image_url ? (
-                        <img src={s.image_url} alt="" className="h-16 w-24 object-cover rounded-md" />
+                        <img
+                          src={s.image_url}
+                          alt=""
+                          className="h-16 w-24 object-cover rounded-md"
+                        />
                       ) : (
                         <div className="h-16 w-24 rounded-md bg-muted grid place-items-center text-muted-foreground text-xs">
                           no img
@@ -154,13 +161,18 @@ function AdminCustomSections() {
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${
-                          s.published ? "bg-electric/10 text-electric" : "bg-muted text-muted-foreground"
+                          s.published
+                            ? "bg-electric/10 text-electric"
+                            : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {s.published ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                         {s.published ? "Online" : "Bozza"}
                       </span>
-                      <button onClick={() => setEditing(s)} className="p-2 rounded-md hover:bg-muted">
+                      <button
+                        onClick={() => setEditing(s)}
+                        className="p-2 rounded-md hover:bg-muted"
+                      >
                         <Pencil className="h-4 w-4" />
                       </button>
                       <button
@@ -185,7 +197,10 @@ function AdminCustomSections() {
               <h2 className="font-display text-xl font-bold">
                 {editing.id ? "Modifica sezione" : "Nuova sezione"}
               </h2>
-              <button onClick={() => setEditing(null)} className="text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setEditing(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 ✕
               </button>
             </div>
@@ -208,7 +223,9 @@ function AdminCustomSections() {
                   <select
                     className={inputCls}
                     value={editing.heading_level}
-                    onChange={(e) => setEditing({ ...editing, heading_level: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setEditing({ ...editing, heading_level: Number(e.target.value) })
+                    }
                   >
                     <option value={2}>H2 — Titolo principale di sezione</option>
                     <option value={3}>H3 — Sottosezione</option>
@@ -264,7 +281,10 @@ function AdminCustomSections() {
                     className={inputCls}
                     value={editing.image_position}
                     onChange={(e) =>
-                      setEditing({ ...editing, image_position: e.target.value as Section["image_position"] })
+                      setEditing({
+                        ...editing,
+                        image_position: e.target.value as Section["image_position"],
+                      })
                     }
                   >
                     <option value="right">A destra del testo</option>
@@ -325,7 +345,9 @@ function AdminCustomSections() {
                   <select
                     className={inputCls}
                     value={String(editing.published)}
-                    onChange={(e) => setEditing({ ...editing, published: e.target.value === "true" })}
+                    onChange={(e) =>
+                      setEditing({ ...editing, published: e.target.value === "true" })
+                    }
                   >
                     <option value="true">Pubblicato</option>
                     <option value="false">Bozza (nascosto)</option>
@@ -334,7 +356,10 @@ function AdminCustomSections() {
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-6 border-t border-border">
-              <button onClick={() => setEditing(null)} className="px-4 py-2 rounded-md hover:bg-muted">
+              <button
+                onClick={() => setEditing(null)}
+                className="px-4 py-2 rounded-md hover:bg-muted"
+              >
                 Annulla
               </button>
               <button

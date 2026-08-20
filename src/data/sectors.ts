@@ -2,7 +2,8 @@ export const sectors = [
   {
     slug: "impianti-tecnologici",
     title: "Impianti tecnologici civili e industriali",
-    short: "Impianti elettrici, meccanici, termoidraulici e speciali per edifici civili e industriali.",
+    short:
+      "Impianti elettrici, meccanici, termoidraulici e speciali per edifici civili e industriali.",
     description:
       "Realizziamo impianti elettrici, meccanici, idrosanitari, di climatizzazione, antincendio, fotovoltaici e speciali, per il settore civile e industriale. Progettazione integrata, esecuzione certificata e collaudo finale a regola d'arte.",
     items: [
@@ -61,4 +62,4 @@ export const sectors = [
   },
 ] as const;
 
-export type SectorSlug = typeof sectors[number]["slug"];
+export type SectorSlug = (typeof sectors)[number]["slug"];

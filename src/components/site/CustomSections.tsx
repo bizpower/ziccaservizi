@@ -44,7 +44,7 @@ export function CustomSections({ page }: { page: string }) {
 }
 
 function SectionBlock({ s }: { s: Row }) {
-  const Heading = (`h${s.heading_level}` as unknown) as "h2";
+  const Heading = `h${s.heading_level}` as unknown as "h2";
   const isDark = s.background_style === "dark" || s.background_style === "gradient";
   const isBg = s.image_position === "background" && s.image_url;
 
@@ -96,7 +96,11 @@ function SectionBlock({ s }: { s: Row }) {
     return (
       <section className={`py-20 ${bgClass[s.background_style]}`}>
         <div className="max-w-5xl mx-auto px-6">
-          <img src={s.image_url} alt="" className="w-full h-72 md:h-96 object-cover rounded-2xl mb-10" />
+          <img
+            src={s.image_url}
+            alt=""
+            className="w-full h-72 md:h-96 object-cover rounded-2xl mb-10"
+          />
           {content}
         </div>
       </section>
@@ -108,11 +112,19 @@ function SectionBlock({ s }: { s: Row }) {
       <section className={`py-20 ${bgClass[s.background_style]}`}>
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           {s.image_position === "left" && (
-            <img src={s.image_url} alt="" className="w-full h-80 md:h-[28rem] object-cover rounded-2xl" />
+            <img
+              src={s.image_url}
+              alt=""
+              className="w-full h-80 md:h-[28rem] object-cover rounded-2xl"
+            />
           )}
           <div>{content}</div>
           {s.image_position === "right" && (
-            <img src={s.image_url} alt="" className="w-full h-80 md:h-[28rem] object-cover rounded-2xl" />
+            <img
+              src={s.image_url}
+              alt=""
+              className="w-full h-80 md:h-[28rem] object-cover rounded-2xl"
+            />
           )}
         </div>
       </section>
