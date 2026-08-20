@@ -1,26 +1,24 @@
 # Media da ripristinare
 
-La migrazione del codice è completa; i **file binari** (foto e video) non sono
-stati trasferiti automaticamente perché l'ambiente di migrazione non ha accesso
-di rete ai domini `lovable.app` / `ziccaservizi.it`.
+## 1. Immagini: recuperate ✅
 
-## 1. Immagini segnaposto da sostituire
+Tutte le immagini del progetto originale sono state trasferite e verificate
+byte per byte (md5 identico all'originale Lovable):
 
-Sono presenti file segnaposto (rettangoli in tinta) con lo stesso nome e percorso
-degli originali: basta sovrascriverli con i file veri, senza toccare il codice.
+| Percorso | Dimensioni | Byte | md5 |
+| --- | --- | --- | --- |
+| `public/logo-zicca.png` | PNG 283×84 | 25.756 | d74c9492e4049fa522585938baa3924d |
+| `public/favicon.png` | PNG 283×84 | 25.756 | d74c9492e4049fa522585938baa3924d |
+| `public/milano-united/logo.png` | PNG 640×640 | 344.356 | 0fac686073fd2468c6802df8718fd9f5 |
+| `src/assets/hero-industrial.jpg` | JPEG 1920×1080 | 245.896 | a4a0f3a395f5f1c446c248545851da02 |
+| `src/assets/cta-bg.jpg` | JPEG 1920×1080 | 298.871 | 43431d3dc0faa8e38aca5fe3d6ed02ac |
+| `src/assets/sector-electrical.jpg` | JPEG 1280×960 | 104.408 | 62b1847b3a03a4a141931cd325c660b9 |
+| `src/assets/sector-edile.jpg` | JPEG 1280×960 | 226.101 | 4a4a61393ce272054794c40c228235c9 |
+| `src/assets/sector-maintenance.jpg` | JPEG 1280×960 | 112.390 | 110aee27a73f1108d60afa6c94314343 |
+| `src/assets/sector-design.jpg` | JPEG 1280×960 | 142.789 | ccff826c975e725ec58769b181a2b0a6 |
+| `src/assets/team.jpg` | JPEG 1600×1000 | 186.390 | d905036350c4dc39427ca11fa48cdc40 |
 
-| Percorso | Originale |
-| --- | --- |
-| `public/logo-zicca.png` | logo Zicca Servizi (283×84) |
-| `public/favicon.png` | favicon |
-| `public/milano-united/logo.png` | logo Milano United |
-| `src/assets/hero-industrial.jpg` | foto hero homepage |
-| `src/assets/cta-bg.jpg` | sfondo sezione CTA |
-| `src/assets/sector-electrical.jpg` | settore impianti tecnologici |
-| `src/assets/sector-edile.jpg` | settore edile |
-| `src/assets/sector-maintenance.jpg` | settore manutenzione |
-| `src/assets/sector-design.jpg` | settore progettazione |
-| `src/assets/team.jpg` | foto team |
+Restano da trasferire solo i **video** (punto 2).
 
 ## 2. Video (hosting esterno)
 
@@ -59,13 +57,19 @@ Esempio di manifest compilato:
 Finché `url` resta vuoto le sezioni video (homepage e `/milano-united`) vengono
 semplicemente nascoste: il sito resta corretto e navigabile.
 
-## 3. Come recuperare i file originali
+## 3. Come recuperare i video originali
 
-Tre strade, in ordine di comodità:
+I file sono ancora nel progetto Lovable. Tre strade:
 
-1. **Export GitHub da Lovable** — nell'editor Lovable: GitHub → Connect →
-   push su un repository. Da lì i binari si copiano direttamente in questo repo.
-2. **Download manuale** dall'editor Lovable / dal sito attuale
-   `www.ziccaservizi.it` e commit in questo repository.
-3. **Sblocco di rete** verso `lovable.app` nell'ambiente di migrazione, così da
-   automatizzare il trasferimento.
+1. **Export GitHub da Lovable** — nell'editor Lovable: GitHub → Connect → push
+   su un repository; da lì si caricano su Supabase Storage.
+2. **Download manuale** dall'editor Lovable e upload nel bucket `zicca-media`
+   (Supabase → Storage), poi compilare i manifest.
+3. **Ricaricarli dal pannello admin**: `/admin` → Contenuti sito consente già
+   l'upload del video hero; per i video delle gallery serve invece compilare i
+   manifest `.asset.json`.
+
+Nota tecnica sul perché non è stato automatizzato: l'ambiente di migrazione non
+ha accesso di rete a `lovable.app`, `supabase.co` e `ziccaservizi.it` (policy di
+egress), e i video pesano complessivamente ~430 MB, quindi non sono trasferibili
+attraverso il canale usato per le immagini.

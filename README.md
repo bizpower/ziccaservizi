@@ -98,17 +98,18 @@ Per cambiare piattaforma basta il preset Nitro corrispondente
 
 ## Media
 
-Immagini e video del progetto originale non sono inclusi in questo repository
-(vedi `MEDIA.md`): i file `src/assets/*.jpg`, `public/*.png` sono **segnaposto**
-e i manifest `src/assets/**/*.asset.json` hanno il campo `url` vuoto in attesa
-dell'URL pubblico definitivo.
+Le immagini originali (logo, favicon, foto hero/settori/team, logo Milano
+United) sono state trasferite e verificate byte per byte. Restano da ricaricare
+solo i **video**: i manifest `src/assets/**/*.asset.json` hanno il campo `url`
+vuoto e finché resta tale le sezioni video non vengono mostrate. Dettagli in
+`MEDIA.md`.
 
 ## Stato della migrazione
 
 Da completare, con le procedure già pronte:
 
-- **Media** → `MEDIA.md`: sostituire le immagini segnaposto e caricare i video
-  su `zicca-media`.
+- **Video** → `MEDIA.md`: caricarli su `zicca-media` e compilare i manifest
+  (le immagini sono già a posto).
 - **Dati del vecchio database** → `DATI.md`: il backend Lovable Cloud non era
   raggiungibile al momento della migrazione; il nuovo schema è pronto e vuoto.
 - **Variabili d'ambiente su Vercel**: progetto `ziccaservizi`
