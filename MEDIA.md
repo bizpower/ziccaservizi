@@ -57,37 +57,26 @@ ffmpeg -i originale.mp4 -c:v libx264 -crf 28 -preset slow \
 In alternativa si passa a un piano superiore o si usa un altro storage
 (Cloudflare R2/Stream, Bunny).
 
-### Upload nel bucket `zicca-media`
+### Upload dal pannello admin (via consigliata)
 
-Il modo più semplice è dal dashboard Supabase → Storage → `zicca-media`,
-creando la cartella `videos/` (e `videos/posters/` per le anteprime).
+Da `/admin` → **Contenuti sito** ci sono due riquadri, «Video della homepage» e
+«Video Milano United»: per ogni video si inserisce titolo e descrizione e si
+caricano file e anteprima direttamente dal browser. I file finiscono nel bucket
+`zicca-media` e la lista viene salvata in `zicca.site_settings`, quindi non
+serve toccare il codice né rifare il deploy.
 
-Da riga di comando servono i permessi di admin; in fase di migrazione era stata
-usata una finestra temporanea con la chiave anon, aperta e richiusa con:
+Se la lista è vuota il sito ricade sui manifest `.asset.json` e, se vuoti anche
+quelli, nasconde del tutto la sezione video.
 
-```sql
--- apertura (solo per il tempo dell'upload)
-CREATE POLICY "Zicca temp migration upload"
-  ON storage.objects FOR INSERT TO anon
-  WITH CHECK (bucket_id = 'zicca-media' AND name LIKE 'videos/%');
+### Upload dal dashboard Supabase (alternativa)
 
--- chiusura (obbligatoria a upload finito)
-DROP POLICY "Zicca temp migration upload" ON storage.objects;
-```
+Supabase → Storage → `zicca-media`, cartella `videos/` (e `videos/posters/` per
+le anteprime); poi si incollano gli URL pubblici nei manifest come qui sotto.
 
-```bash
-BASE=https://mrbkuvbxqhwrtnhmpxum.supabase.co
-KEY=<chiave anon del progetto>
-curl -sS -X POST "$BASE/storage/v1/object/zicca-media/videos/sgarro-web.mp4" \
-  -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
-  -H "Content-Type: video/mp4" -H "x-upsert: true" \
-  --data-binary @sgarro-web.mp4
-```
+### Compilare i manifest (solo se non si usa il pannello)
 
-### Compilare i manifest
-
-Dopo l'upload va scritto l'URL pubblico nel campo `url` del manifest
-corrispondente:
+Se si preferisce tenere i video nel codice, va scritto l'URL pubblico nel campo
+`url` del manifest corrispondente:
 
 ```
 src/assets/videos/
@@ -121,13 +110,10 @@ semplicemente nascoste: il sito resta corretto e navigabile.
 
 I file sono ancora nel progetto Lovable. Tre strade:
 
-1. **Export GitHub da Lovable** — nell'editor Lovable: GitHub → Connect → push
-   su un repository; da lì si caricano su Supabase Storage.
-2. **Download manuale** dall'editor Lovable e upload nel bucket `zicca-media`
-   (Supabase → Storage), poi compilare i manifest.
-3. **Ricaricarli dal pannello admin**: `/admin` → Contenuti sito consente già
-   l'upload del video hero; per i video delle gallery serve invece compilare i
-   manifest `.asset.json`.
+1. **Download manuale** dall'editor Lovable e caricamento dal pannello admin
+   (`/admin` → Contenuti sito): è la via più rapida e non richiede deploy.
+2. **Export GitHub da Lovable** — nell'editor Lovable: GitHub → Connect → push
+   su un repository, da cui recuperare i file originali.
 
 Nota tecnica sul perché non è stato automatizzato: l'ambiente di migrazione non
 ha accesso di rete a `lovable.app`, `supabase.co` e `ziccaservizi.it` (policy di

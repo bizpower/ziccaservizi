@@ -4,13 +4,13 @@ Documento operativo per la messa online e il passaggio al cliente.
 
 ## 1. Cosa viene consegnato
 
-| Elemento | Dove |
-| --- | --- |
-| Codice sorgente | `github.com/bizpower/ziccaservizi` (branch `main`) |
-| Hosting | Vercel, progetto `ziccaservizi` (team Bizpower SRL), collegato al repo |
-| Database + Auth + Storage | Supabase, progetto `ZiccaServizi` (`mrbkuvbxqhwrtnhmpxum`), schema `zicca`, bucket `zicca-media` |
-| Sito pubblico | Home, Azienda, Settori (indice + pagina per settore), Referenze, Certificazioni, Milano United, Contatti, `sitemap.xml` |
-| Area riservata | `/login` + `/admin` (dashboard, richieste, settori, referenze, certificazioni, sezioni custom, contenuti sito) |
+| Elemento                  | Dove                                                                                                                    |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Codice sorgente           | `github.com/bizpower/ziccaservizi` (branch `main`)                                                                      |
+| Hosting                   | Vercel, progetto `ziccaservizi` (team Bizpower SRL), collegato al repo                                                  |
+| Database + Auth + Storage | Supabase, progetto `ZiccaServizi` (`mrbkuvbxqhwrtnhmpxum`), schema `zicca`, bucket `zicca-media`                        |
+| Sito pubblico             | Home, Azienda, Settori (indice + pagina per settore), Referenze, Certificazioni, Milano United, Contatti, `sitemap.xml` |
+| Area riservata            | `/login` + `/admin` (dashboard, richieste, settori, referenze, certificazioni, sezioni custom, contenuti sito)          |
 
 Nessuna dipendenza da Lovable: build, deploy e database sono interamente sotto
 il controllo del proprietario del repository.
@@ -60,14 +60,14 @@ registrar del cliente. Il certificato HTTPS è automatico.
 
 ## 3. Cosa può fare il cliente dal pannello
 
-| Sezione admin | Effetto sul sito |
-| --- | --- |
-| **Richieste** | Elenco dei contatti arrivati dal form, con stato (nuova / in lavorazione / chiusa) ed eliminazione |
-| **Settori** | Pilota la sezione settori in home, la pagina `/settori` e le pagine di dettaglio `/settori/<slug>` |
-| **Referenze** | Pilota la gallery di `/referenze`, con filtro per categoria |
-| **Certificazioni** | Pilota le schede di `/certificazioni`, con link al PDF quando caricato |
-| **Sezioni custom** | Aggiunge blocchi liberi (titolo, testo markdown, immagine, pulsante) a qualsiasi pagina, con ordine e stile |
-| **Contenuti sito** | Video e immagine di sfondo della home, numeri animati, recapiti aziendali |
+| Sezione admin      | Effetto sul sito                                                                                                     |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Richieste**      | Elenco dei contatti arrivati dal form, con stato (nuova / in lavorazione / chiusa) ed eliminazione                   |
+| **Settori**        | Pilota la sezione settori in home, la pagina `/settori` e le pagine di dettaglio `/settori/<slug>`                   |
+| **Referenze**      | Pilota la gallery di `/referenze`, con filtro per categoria                                                          |
+| **Certificazioni** | Pilota le schede di `/certificazioni`, con link al PDF quando caricato                                               |
+| **Sezioni custom** | Aggiunge blocchi liberi (titolo, testo markdown, immagine, pulsante) a qualsiasi pagina, con ordine e stile          |
+| **Contenuti sito** | Video e immagine di sfondo della home, **gallery video di home e Milano United**, numeri animati, recapiti aziendali |
 
 Finché una sezione del pannello è vuota, il sito mostra i contenuti predefiniti
 già presenti nel codice: **non resta mai una pagina spoglia**, nemmeno se il
@@ -79,8 +79,10 @@ sono immediatamente pubblici.
 ## 4. Punti aperti
 
 1. **Video** (`MEDIA.md`) — gli 8 video sono ancora solo sul progetto Lovable.
-   Finché i manifest `.asset.json` hanno `url` vuoto, le sezioni video di home e
-   `/milano-united` restano nascoste e il resto del sito funziona normalmente.
+   Finché non vengono caricati, le sezioni video di home e `/milano-united`
+   restano nascoste e il resto del sito funziona normalmente. Non serve un
+   intervento tecnico: si caricano da `/admin` → Contenuti sito (limite 50 MB
+   per file sul piano Supabase Free, tre video vanno quindi ricompressi).
 2. **Dati del vecchio database** (`DATI.md`) — al momento della migrazione il
    backend Lovable Cloud non era raggiungibile. Le tabelle nuove sono vuote; il
    sito usa i contenuti predefiniti.

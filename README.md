@@ -103,29 +103,30 @@ gestite da `/admin`) e ricadono sull'elenco statico presente nel codice quando
 la tabella è vuota o il database non risponde: il sito non resta mai spoglio e
 non va in errore per un problema di connessione al database.
 
-| Pagina | Sorgente dinamica | Fallback |
-| --- | --- | --- |
-| Home + `/settori` + `/settori/$slug` | `zicca.sectors` | `src/data/sectors.ts` |
-| `/referenze` | `zicca.projects` (righe con immagine) | elenco in `src/routes/referenze.tsx` |
-| `/certificazioni` | `zicca.certifications` | elenco in `src/routes/certificazioni.tsx` |
-| Blocchi liberi su tutte le pagine | `zicca.custom_sections` | nessuno (sezione assente) |
-| Video/poster hero della home | `zicca.site_settings` → `hero` | immagine `hero-industrial.jpg` |
+| Pagina                               | Sorgente dinamica                                        | Fallback                                            |
+| ------------------------------------ | -------------------------------------------------------- | --------------------------------------------------- |
+| Home + `/settori` + `/settori/$slug` | `zicca.sectors`                                          | `src/data/sectors.ts`                               |
+| `/referenze`                         | `zicca.projects` (righe con immagine)                    | elenco in `src/routes/referenze.tsx`                |
+| `/certificazioni`                    | `zicca.certifications`                                   | elenco in `src/routes/certificazioni.tsx`           |
+| Blocchi liberi su tutte le pagine    | `zicca.custom_sections`                                  | nessuno (sezione assente)                           |
+| Video/poster hero della home         | `zicca.site_settings` → `hero`                           | immagine `hero-industrial.jpg`                      |
+| Gallery video home e Milano United   | `zicca.site_settings` → `videos`, `videos_milano_united` | manifest `.asset.json`, altrimenti sezione nascosta |
 
 ## Media
 
 Le immagini originali (logo, favicon, foto hero/settori/team, logo Milano
 United) sono state trasferite e verificate byte per byte. Restano da ricaricare
-solo i **video**: i manifest `src/assets/**/*.asset.json` hanno il campo `url`
-vuoto e finché resta tale le sezioni video non vengono mostrate. Dettagli in
-`MEDIA.md`.
+solo i **video**, che si caricano direttamente dal pannello admin (`/admin` →
+Contenuti sito): finché non ci sono, le sezioni video restano nascoste.
+Dettagli in `MEDIA.md`.
 
 ## Stato della migrazione
 
 Per la messa online e il passaggio al cliente vedi **`CONSEGNA.md`**.
 Da completare, con le procedure già pronte:
 
-- **Video** → `MEDIA.md`: caricarli su `zicca-media` e compilare i manifest
-  (le immagini sono già a posto).
+- **Video** → `MEDIA.md`: caricarli dal pannello admin (le immagini sono già a
+  posto).
 - **Dati del vecchio database** → `DATI.md`: il backend Lovable Cloud non era
   raggiungibile al momento della migrazione; il nuovo schema è pronto e vuoto.
 - **Variabili d'ambiente su Vercel**: progetto `ziccaservizi`

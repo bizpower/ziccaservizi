@@ -20,12 +20,16 @@ function AdminSettings() {
   const [hero, setHero] = useState<any>({});
   const [stats, setStats] = useState<any[]>([]);
   const [contact, setContact] = useState<any>({});
+  const [videos, setVideos] = useState<VideoEntry[]>([]);
+  const [muVideos, setMuVideos] = useState<VideoEntry[]>([]);
 
   useEffect(() => {
     if (q.data) {
       setHero(q.data.hero ?? {});
       setStats(q.data.stats ?? []);
       setContact(q.data.contact ?? {});
+      setVideos(Array.isArray(q.data.videos) ? q.data.videos : []);
+      setMuVideos(Array.isArray(q.data.videos_milano_united) ? q.data.videos_milano_united : []);
     }
   }, [q.data]);
 
@@ -170,6 +174,26 @@ function AdminSettings() {
         </div>
       </Card>
 
+      {/* VIDEO HOME */}
+      <Card title="Video della homepage" onSave={() => save("videos", videos)}>
+        <VideoListEditor
+          items={videos}
+          onChange={setVideos}
+          folder="videos"
+          hint="Compaiono nella sezione «I nostri video» della homepage. Se la lista è vuota la sezione non viene mostrata."
+        />
+      </Card>
+
+      {/* VIDEO MILANO UNITED */}
+      <Card title="Video Milano United" onSave={() => save("videos_milano_united", muVideos)}>
+        <VideoListEditor
+          items={muVideos}
+          onChange={setMuVideos}
+          folder="videos/milano-united"
+          hint="Compaiono nella pagina /milano-united. Se la lista è vuota la sezione non viene mostrata."
+        />
+      </Card>
+
       {/* CONTACT */}
       <Card title="Contatti azienda" onSave={() => save("contact", contact)}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -298,6 +322,91 @@ function updateArr<T>(arr: T[], setter: (v: T[]) => void, i: number, value: T) {
   const next = [...arr];
   next[i] = value;
   setter(next);
+}
+
+type VideoEntry = {
+  title?: string;
+  description?: string;
+  video_url?: string;
+  poster_url?: string;
+};
+
+function VideoListEditor({
+  items,
+  onChange,
+  folder,
+  hint,
+}: {
+  items: VideoEntry[];
+  onChange: (v: VideoEntry[]) => void;
+  folder: string;
+  hint: string;
+}) {
+  const update = (i: number, value: VideoEntry) => updateArr(items, onChange, i, value);
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-muted-foreground">{hint}</p>
+
+      {items.map((v, i) => (
+        <fieldset key={i} className="rounded-lg border border-border p-4 space-y-3">
+          <legend className="text-xs uppercase tracking-wider text-muted-foreground px-2">
+            Video {i + 1}
+          </legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Titolo">
+              <input
+                className={inputCls}
+                value={v.title ?? ""}
+                onChange={(e) => update(i, { ...v, title: e.target.value })}
+              />
+            </Field>
+            <Field label="Descrizione breve">
+              <input
+                className={inputCls}
+                value={v.description ?? ""}
+                onChange={(e) => update(i, { ...v, description: e.target.value })}
+              />
+            </Field>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <MediaUpload
+              label="File video (mp4/webm)"
+              accept="video/mp4,video/webm"
+              folder={folder}
+              value={v.video_url ?? ""}
+              onChange={(url) => update(i, { ...v, video_url: url })}
+            />
+            <MediaUpload
+              label="Anteprima (immagine)"
+              accept="image/*"
+              folder={`${folder}/posters`}
+              value={v.poster_url ?? ""}
+              onChange={(url) => update(i, { ...v, poster_url: url })}
+            />
+          </div>
+          <button
+            onClick={() => onChange(items.filter((_, k) => k !== i))}
+            className="inline-flex items-center gap-2 text-sm text-destructive hover:underline"
+          >
+            <Trash2 className="h-4 w-4" /> Rimuovi video
+          </button>
+        </fieldset>
+      ))}
+
+      <button
+        onClick={() => onChange([...items, { title: "", description: "" }])}
+        className="inline-flex items-center gap-2 text-sm text-electric hover:underline"
+      >
+        <Plus className="h-4 w-4" /> Aggiungi video
+      </button>
+
+      <p className="text-xs text-muted-foreground">
+        Formato consigliato: mp4 H.264, verticale 9:16 per le gallery, max 50 MB per file (limite
+        dello storage). Ricordati di premere «Salva».
+      </p>
+    </div>
+  );
 }
 
 function Card({

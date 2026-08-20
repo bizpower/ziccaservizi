@@ -1,6 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
 import { SectionHeader } from "@/components/site/SectionHeader";
+import { getSiteSettings } from "@/lib/content.functions";
+import { resolveVideos, type VideoItem } from "@/lib/video-content";
 
 import capoVid from "@/assets/videos/capo-ti-segue-web.mp4.asset.json";
 import capoPoster from "@/assets/videos/capo-ti-segue-poster.jpg.asset.json";
@@ -13,14 +17,7 @@ import sgarroPoster from "@/assets/videos/sgarro-poster.jpg.asset.json";
 import revampingVid from "@/assets/videos/revamping-web.mp4.asset.json";
 import revampingPoster from "@/assets/videos/revamping-poster.jpg.asset.json";
 
-type Item = {
-  title: string;
-  description: string;
-  video: string;
-  poster: string;
-};
-
-const allItems: Item[] = [
+const manifestItems: VideoItem[] = [
   {
     title: "Capo ti segue",
     description: "Il nostro modo di stare in cantiere: il capo guida, la squadra segue.",
@@ -53,11 +50,14 @@ const allItems: Item[] = [
   },
 ];
 
-// I video sono ospitati esternamente (vedi src/assets/**/*.asset.json):
-// finché l'URL non è compilato la card non viene mostrata.
-const items = allItems.filter((it) => Boolean(it.video));
-
 export function VideoShowcase() {
+  const fetchSettings = useServerFn(getSiteSettings);
+  const { data: settings } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: () => fetchSettings(),
+  });
+  const items = useMemo(() => resolveVideos(settings?.videos, manifestItems), [settings]);
+
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);

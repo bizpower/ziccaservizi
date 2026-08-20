@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
+import { getSiteSettings } from "@/lib/content.functions";
+import { resolveVideos, type VideoItem } from "@/lib/video-content";
 
 import tataVid from "@/assets/milano-united/tata-parla.mp4.asset.json";
 import tataPoster from "@/assets/milano-united/tata-parla-poster.jpg.asset.json";
@@ -9,9 +13,7 @@ import challPoster from "@/assets/milano-united/challenge-2-poster.jpg.asset.jso
 import veroVid from "@/assets/milano-united/vero-calcio.mp4.asset.json";
 import veroPoster from "@/assets/milano-united/vero-calcio-poster.jpg.asset.json";
 
-type VItem = { title: string; description: string; video: string; poster: string };
-
-const allVideos: VItem[] = [
+const manifestVideos: VideoItem[] = [
   {
     title: "Tata parla",
     description: "Milano United: parole a bordo campo dal nostro Tata.",
@@ -31,10 +33,6 @@ const allVideos: VItem[] = [
     poster: veroPoster.url,
   },
 ];
-
-// I video sono ospitati esternamente (vedi src/assets/milano-united/*.asset.json):
-// finché l'URL non è compilato la card non viene mostrata.
-const videos = allVideos.filter((v) => Boolean(v.video));
 
 type Player = { n: number; name: string; role: "POR" | "DIF" | "CEN" | "ATT" };
 
@@ -115,15 +113,17 @@ export const Route = createFileRoute("/milano-united")({
         { "@type": "ListItem", position: 2, name: "Milano United", item: "/milano-united" },
       ],
     };
-    const videoLd = videos.map((v) => ({
-      "@context": "https://schema.org",
-      "@type": "VideoObject",
-      name: v.title,
-      description: v.description,
-      thumbnailUrl: [v.poster],
-      contentUrl: v.video,
-      uploadDate: new Date().toISOString().split("T")[0],
-    }));
+    const videoLd = manifestVideos
+      .filter((v) => Boolean(v.video))
+      .map((v) => ({
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: v.title,
+        description: v.description,
+        thumbnailUrl: [v.poster],
+        contentUrl: v.video,
+        uploadDate: new Date().toISOString().split("T")[0],
+      }));
     return {
       meta: [
         { title: "Milano United | Squadra Calcio a 11 Zicca Servizi Milano" },
@@ -149,7 +149,10 @@ export const Route = createFileRoute("/milano-united")({
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(teamLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbs) },
-        { type: "application/ld+json", children: JSON.stringify(videoLd) },
+        // I dati strutturati dei video hanno senso solo se i file sono online.
+        ...(videoLd.length > 0
+          ? [{ type: "application/ld+json", children: JSON.stringify(videoLd) }]
+          : []),
       ],
     };
   },
@@ -203,6 +206,16 @@ function FormationRow({ players }: { players: Player[] }) {
 }
 
 function MilanoUnitedPage() {
+  const fetchSettings = useServerFn(getSiteSettings);
+  const { data: settings } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: () => fetchSettings(),
+  });
+  const videos = useMemo(
+    () => resolveVideos(settings?.videos_milano_united, manifestVideos),
+    [settings],
+  );
+
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [playing, setPlaying] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
