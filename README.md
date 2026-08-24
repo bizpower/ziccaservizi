@@ -114,22 +114,25 @@ non va in errore per un problema di connessione al database.
 
 ## Media
 
-Le immagini originali (logo, favicon, foto hero/settori/team, logo Milano
-United) sono state trasferite e verificate byte per byte. Restano da ricaricare
-solo i **video**, che si caricano direttamente dal pannello admin (`/admin` →
-Contenuti sito): finché non ci sono, le sezioni video restano nascoste.
-Dettagli in `MEDIA.md`.
+Immagini e video del progetto originale sono stati trasferiti integralmente:
+le immagini (logo, favicon, foto hero/settori/team, logo Milano United) vivono
+nel repository e sono verificate byte per byte; gli 8 video con i rispettivi
+poster stanno nel bucket Supabase `zicca-media` e sono referenziati sia da
+`zicca.site_settings` sia dai manifest `.asset.json`. Per sostituirli si usa
+`/admin` → Contenuti sito, senza deploy. Dettagli in `MEDIA.md`.
 
 ## Stato della migrazione
 
 Per la messa online e il passaggio al cliente vedi **`CONSEGNA.md`**.
-Da completare, con le procedure già pronte:
+Codice, schema del database, immagini e video sono completi. Restano tre
+passaggi manuali:
 
-- **Video** → `MEDIA.md`: caricarli dal pannello admin (le immagini sono già a
-  posto).
-- **Dati del vecchio database** → `DATI.md`: il backend Lovable Cloud non era
-  raggiungibile al momento della migrazione; il nuovo schema è pronto e vuoto.
 - **Variabili d'ambiente su Vercel**: progetto `ziccaservizi`
   (team Bizpower SRL) già collegato a questo repository, branch di produzione
   `main`. Prima del primo deploy vanno inserite le variabili di `.env.example`,
   inclusa `SUPABASE_SERVICE_ROLE_KEY`.
+- **Dati del vecchio database** → `DATI.md`: il backend Lovable Cloud non era
+  raggiungibile al momento della migrazione; il nuovo schema è pronto e vuoto e
+  il sito usa i contenuti predefiniti.
+- **Visibilità del repository**: da rendere privato dalle impostazioni GitHub,
+  se il cliente lo preferisce.
