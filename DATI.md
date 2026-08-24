@@ -15,8 +15,29 @@ Tentativi effettuati (20/08/2026):
 | `psql` diretto (dal sandbox Lovable)                | tenant/user non trovato                   |
 | REST API Supabase (da qui e dal sandbox Lovable)    | rete bloccata / DNS non risolto           |
 
-È un'indisponibilità del backend Lovable Cloud, non una perdita di dati: i dati
-sono ancora nel progetto originale.
+Ritentato il 24/08/2026, con lo stesso esito:
+
+| Canale                                             | Esito                                          |
+| -------------------------------------------------- | ---------------------------------------------- |
+| `query_database` (API Lovable)                     | ancora `499 request_cancelled`                 |
+| Script Node + `@supabase/supabase-js` nel sandbox  | `getent hosts <ref>.supabase.co` → DNS KO      |
+| `curl` sulla REST API dal sandbox                  | codice HTTP `000` (timeout di connessione)     |
+| Tool SQL dell'agente Lovable (`read_query`)        | timeout di connessione                         |
+
+Non è un problema di chiavi né di RLS: l'host del database del vecchio progetto
+non è proprio risolvibile. È un'indisponibilità del backend Lovable Cloud, non
+una perdita di dati: i dati sono ancora nel progetto originale.
+
+Nel progetto Lovable è stato lasciato pronto lo script `scripts/export-db.mjs`:
+quando il backend torna raggiungibile basta lanciarlo dal sandbox per ottenere
+l'export completo delle sei tabelle.
+
+```bash
+bun scripts/export-db.mjs        # scrive _export/db-export.json
+```
+
+Attenzione: l'output contiene la tabella `leads` con dati personali, quindi non
+va scritto in `public/` né pubblicato.
 
 ## 1. Esportare i dati da Lovable
 
