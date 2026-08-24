@@ -67,7 +67,7 @@ registrar del cliente. Il certificato HTTPS è automatico.
 | **Referenze**      | Pilota la gallery di `/referenze`, con filtro per categoria                                                          |
 | **Certificazioni** | Pilota le schede di `/certificazioni`, con link al PDF quando caricato                                               |
 | **Sezioni custom** | Aggiunge blocchi liberi (titolo, testo markdown, immagine, pulsante) a qualsiasi pagina, con ordine e stile          |
-| **Contenuti sito** | Video e immagine di sfondo della home, **gallery video di home e Milano United**, numeri animati, recapiti aziendali |
+| **Contenuti sito** | Video e immagine di sfondo della home, **gallery video di home e Milano United** (già popolate), numeri animati, recapiti aziendali |
 
 Finché una sezione del pannello è vuota, il sito mostra i contenuti predefiniti
 già presenti nel codice: **non resta mai una pagina spoglia**, nemmeno se il
@@ -78,16 +78,18 @@ sono immediatamente pubblici.
 
 ## 4. Punti aperti
 
-1. **Video** (`MEDIA.md`) — gli 8 video sono ancora solo sul progetto Lovable.
-   Finché non vengono caricati, le sezioni video di home e `/milano-united`
-   restano nascoste e il resto del sito funziona normalmente. Non serve un
-   intervento tecnico: si caricano da `/admin` → Contenuti sito (limite 50 MB
-   per file sul piano Supabase Free, tre video vanno quindi ricompressi).
+1. **Variabili d'ambiente su Vercel** — vanno inserite a mano (punto 2a): il
+   token di questa migrazione non ha i permessi per scriverle. È l'unico
+   passaggio obbligatorio prima del primo deploy.
 2. **Dati del vecchio database** (`DATI.md`) — al momento della migrazione il
-   backend Lovable Cloud non era raggiungibile. Le tabelle nuove sono vuote; il
-   sito usa i contenuti predefiniti.
+   backend Lovable Cloud non era raggiungibile, quindi i contenuti inseriti da
+   Lovable non sono stati esportati. Le tabelle nuove sono vuote e il sito usa i
+   contenuti predefiniti del codice: il cliente può ripopolarle dal pannello
+   admin, oppure si riprova l'export quando Lovable torna disponibile.
 3. **Repository pubblico** — se il cliente preferisce, va reso privato da
    GitHub → Settings → Danger Zone → Change visibility.
+
+Video e immagini sono invece **completi**: vedi `MEDIA.md`.
 
 ## 5. Verifiche già effettuate
 
@@ -96,6 +98,9 @@ sono immediatamente pubblici.
 - Tutte le rotte pubbliche e l'area admin rispondono 200 in SSR; rotte
   inesistenti danno 404 con pagina dedicata in italiano.
 - Immagini originali trasferite e verificate con md5 rispetto agli originali.
+- Tutti e 8 i video + poster caricati nel bucket `zicca-media` e collegati in
+  `zicca.site_settings`: le sezioni video di home e `/milano-united` sono
+  verificate in SSR (5 video in home, 3 su Milano United).
 - Schema `zicca` applicato con RLS attiva su tutte le tabelle; lettura pubblica
   limitata ai contenuti pubblicati, scritture riservate agli amministratori.
 

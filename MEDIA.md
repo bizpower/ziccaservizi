@@ -1,6 +1,6 @@
-# Media da ripristinare
+# Media del sito
 
-## 1. Immagini: recuperate ✅
+## 1. Immagini: trasferite ✅
 
 Tutte le immagini del progetto originale sono state trasferite e verificate
 byte per byte (md5 identico all'originale Lovable):
@@ -18,65 +18,61 @@ byte per byte (md5 identico all'originale Lovable):
 | `src/assets/sector-design.jpg`      | JPEG 1280×960  | 142.789 | ccff826c975e725ec58769b181a2b0a6 |
 | `src/assets/team.jpg`               | JPEG 1600×1000 | 186.390 | d905036350c4dc39427ca11fa48cdc40 |
 
-Restano da trasferire solo i **video** (punto 2).
+## 2. Video: trasferiti ✅
 
-## 2. Video: da trasferire
+Tutti e 8 i video (con i rispettivi poster) sono stati trasferiti dal progetto
+Lovable al bucket Supabase **`zicca-media`**, cartelle `videos/` e
+`videos/posters/`. Sono file pubblici, serviti direttamente dallo storage: non
+stanno nel repository e non pesano sul deploy.
 
-Gli 8 video (con i rispettivi poster) sono ancora solo nel progetto Lovable.
-Non è stato possibile trasferirli automaticamente per due motivi:
+| File                              | Byte su storage | Poster  | Note                     |
+| --------------------------------- | --------------- | ------- | ------------------------ |
+| `capo-ti-segue-web.mp4`           | 44.649.433      | 227.119 | originale                |
+| `ca-granda-spiegazione-web.mp4`   | 17.888.745      | 476.521 | ricompresso (era 77,5 MB) |
+| `qualche-modo-web.mp4`            | 26.924.277      | 209.887 | originale                |
+| `sgarro-web.mp4`                  | 19.834.195      | 181.510 | originale                |
+| `revamping-web.mp4`               | 23.250.512      | 349.512 | ricompresso (era 78,7 MB) |
+| `tata-parla.mp4` (Milano United)  | 13.982.424      | 94.040  | ricompresso (era 50,6 MB) |
+| `challenge-2.mp4` (Milano United) | 37.941.368      | 59.037  | originale                |
+| `vero-calcio.mp4` (Milano United) | 42.223.902      | 105.119 | originale                |
 
-- il workspace Lovable ha **esaurito i crediti** durante il trasferimento (le
-  immagini erano già state recuperate), quindi non è più possibile far eseguire
-  comandi all'agente Lovable;
-- pesano complessivamente ~430 MB: non possono stare nel repository e vanno
-  caricati su storage esterno.
-
-| File                              | Dimensione | Poster |
-| --------------------------------- | ---------- | ------ |
-| `capo-ti-segue-web.mp4`           | 44,6 MB    | 227 KB |
-| `ca-granda-spiegazione-web.mp4`   | 77,5 MB    | 477 KB |
-| `qualche-modo-web.mp4`            | 26,9 MB    | 210 KB |
-| `sgarro-web.mp4`                  | 19,8 MB    | 182 KB |
-| `revamping-web.mp4`               | 78,7 MB    | 350 KB |
-| `tata-parla.mp4` (Milano United)  | 50,6 MB    | 94 KB  |
-| `challenge-2.mp4` (Milano United) | 37,9 MB    | 59 KB  |
-| `vero-calcio.mp4` (Milano United) | 42,2 MB    | 105 KB |
-
-### Attenzione al limite di 50 MB
-
-Il piano Free di Supabase Storage accetta file fino a **50 MB**. Tre video lo
-superano (`ca-granda-spiegazione-web.mp4`, `revamping-web.mp4` e, di poco,
-`tata-parla.mp4`): vanno ricompressi prima dell'upload — cosa comunque
-consigliabile per il web:
+Tre video superavano il limite di 50 MB del piano Supabase Free e sono stati
+ricompressi per il web prima dell'upload:
 
 ```bash
 ffmpeg -i originale.mp4 -c:v libx264 -crf 28 -preset slow \
        -c:a aac -b:a 96k -movflags +faststart compresso.mp4
 ```
 
-In alternativa si passa a un piano superiore o si usa un altro storage
-(Cloudflare R2/Stream, Bunny).
+Gli URL pubblici sono già scritti sia in `zicca.site_settings`
+(chiavi `videos` e `videos_milano_united`, quelle che pilota il pannello admin)
+sia nei manifest `src/assets/**/*.asset.json` usati come fallback.
 
-### Upload dal pannello admin (via consigliata)
+## 3. Come si gestiscono i video da qui in avanti
 
-Da `/admin` → **Contenuti sito** ci sono due riquadri, «Video della homepage» e
-«Video Milano United»: per ogni video si inserisce titolo e descrizione e si
-caricano file e anteprima direttamente dal browser. I file finiscono nel bucket
-`zicca-media` e la lista viene salvata in `zicca.site_settings`, quindi non
-serve toccare il codice né rifare il deploy.
+L'ordine con cui il sito sceglie cosa mostrare è:
 
-Se la lista è vuota il sito ricade sui manifest `.asset.json` e, se vuoti anche
-quelli, nasconde del tutto la sezione video.
+1. `zicca.site_settings` → `videos` / `videos_milano_united` (pannello admin);
+2. i manifest `.asset.json` presenti nel codice;
+3. se nessuna delle due ha URL validi, la sezione video viene nascosta.
 
-### Upload dal dashboard Supabase (alternativa)
+### Sostituire o aggiungere un video (via consigliata)
+
+Da `/admin` → **Contenuti sito**, riquadri «Video della homepage» e «Video
+Milano United»: per ogni video si inseriscono titolo e descrizione e si caricano
+file e anteprima dal browser. I file finiscono in `zicca-media` e la lista viene
+salvata in `zicca.site_settings`: non serve toccare il codice né rifare il
+deploy.
+
+Attenzione al limite di 50 MB per file del piano Supabase Free: per file più
+grandi si ricomprime con il comando ffmpeg qui sopra, oppure si passa a un piano
+superiore o a uno storage esterno (Cloudflare R2/Stream, Bunny).
+
+### Alternativa: dashboard Supabase
 
 Supabase → Storage → `zicca-media`, cartella `videos/` (e `videos/posters/` per
-le anteprime); poi si incollano gli URL pubblici nei manifest come qui sotto.
-
-### Compilare i manifest (solo se non si usa il pannello)
-
-Se si preferisce tenere i video nel codice, va scritto l'URL pubblico nel campo
-`url` del manifest corrispondente:
+le anteprime), poi si incolla l'URL pubblico nel campo `url` del manifest
+corrispondente:
 
 ```
 src/assets/videos/
@@ -91,31 +87,15 @@ src/assets/milano-united/
   vero-calcio.mp4.asset.json                + vero-calcio-poster.jpg.asset.json
 ```
 
-Esempio di manifest compilato:
+Formato del manifest:
 
 ```json
 {
   "version": 1,
   "url": "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/videos/sgarro-web.mp4",
   "original_filename": "sgarro-web.mp4",
-  "size": 19834195,
   "content_type": "video/mp4"
 }
 ```
 
-Finché `url` resta vuoto le sezioni video (homepage e `/milano-united`) vengono
-semplicemente nascoste: il sito resta corretto e navigabile.
-
-## 3. Come recuperare i video originali
-
-I file sono ancora nel progetto Lovable. Tre strade:
-
-1. **Download manuale** dall'editor Lovable e caricamento dal pannello admin
-   (`/admin` → Contenuti sito): è la via più rapida e non richiede deploy.
-2. **Export GitHub da Lovable** — nell'editor Lovable: GitHub → Connect → push
-   su un repository, da cui recuperare i file originali.
-
-Nota tecnica sul perché non è stato automatizzato: l'ambiente di migrazione non
-ha accesso di rete a `lovable.app`, `supabase.co` e `ziccaservizi.it` (policy di
-egress), e i video pesano complessivamente ~430 MB, quindi non sono trasferibili
-attraverso il canale usato per le immagini.
+Questa strada richiede un commit e un nuovo deploy; il pannello admin no.
