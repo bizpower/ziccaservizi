@@ -25,35 +25,39 @@ export const Route = createFileRoute("/referenze")({
 
 type RefItem = { src: string; cat: string; title: string };
 
-/** Usate finché il pannello admin non contiene referenze pubblicate. */
+/**
+ * Usate finché il pannello admin non contiene referenze pubblicate.
+ * Le foto sono ospitate nel bucket `zicca-media`, non più sul vecchio sito
+ * WordPress: il sito resta corretto anche dopo lo spegnimento di quel dominio.
+ */
 const fallbackRefs: RefItem[] = [
   {
-    src: "https://www.ziccaservizi.it/wp-content/uploads/2021/05/163025516_102399431943964_2538584837276504745_n.jpg",
+    src: "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/cantiere-industriale.jpg",
     cat: "Industriale",
     title: "Cantiere industriale",
   },
   {
-    src: "https://www.ziccaservizi.it/wp-content/uploads/2021/01/30.jpg",
+    src: "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/impianto-civile.jpg",
     cat: "Civile",
     title: "Impianto civile",
   },
   {
-    src: "https://www.ziccaservizi.it/wp-content/uploads/2021/01/5-3.jpg",
+    src: "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/quadri-elettrici.jpg",
     cat: "Industriale",
     title: "Quadri elettrici",
   },
   {
-    src: "https://www.ziccaservizi.it/wp-content/uploads/2021/05/JBBG8378.jpg",
+    src: "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/impianto-produttivo.jpg",
     cat: "Industriale",
     title: "Impianto produttivo",
   },
   {
-    src: "https://www.ziccaservizi.it/wp-content/uploads/2021/01/31.jpg",
+    src: "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/edificio-residenziale.jpg",
     cat: "Civile",
     title: "Edificio residenziale",
   },
   {
-    src: "https://www.ziccaservizi.it/wp-content/uploads/2020/07/4-GENOVA-CT.jpg",
+    src: "https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/cabina-trasformazione-genova.jpg",
     cat: "Industriale",
     title: "Cabina trasformazione · Genova",
   },

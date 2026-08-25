@@ -88,27 +88,24 @@ WHERE NOT EXISTS (SELECT 1 FROM zicca.certifications);
 -- -------------------------------------------------------------------------
 -- REFERENZE  (da src/routes/referenze.tsx)
 -- -------------------------------------------------------------------------
--- ATTENZIONE: queste sei immagini sono ancora ospitate sul VECCHIO sito
--- WordPress (www.ziccaservizi.it). Non è stato possibile scaricarle
--- dall'ambiente di migrazione. Quando il dominio verrà puntato su questo
--- sito, quegli URL smetteranno di rispondere e le foto spariranno.
---
--- Vanno quindi ricaricate dal pannello (/admin -> Referenze) prima dello
--- switch del dominio. Il pannello segnala da solo le righe ancora agganciate
--- al vecchio sito, così il passaggio non può essere dimenticato.
+-- Le sei foto erano originariamente hotlinkate dal vecchio sito WordPress
+-- (www.ziccaservizi.it/wp-content/...), che verrà spento quando il dominio
+-- passerà a puntare su questo sito. Sono state trasferite nel bucket
+-- `zicca-media`, cartella `referenze/`, e verificate con md5 rispetto agli
+-- originali: il sito non dipende più da quel dominio.
 INSERT INTO zicca.projects (title, category, location, image_url, sort_order, published)
 SELECT * FROM (VALUES
   ('Cantiere industriale', 'Industriale', NULL,
-   'https://www.ziccaservizi.it/wp-content/uploads/2021/05/163025516_102399431943964_2538584837276504745_n.jpg', 0, true),
+   'https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/cantiere-industriale.jpg', 0, true),
   ('Impianto civile', 'Civile', NULL,
-   'https://www.ziccaservizi.it/wp-content/uploads/2021/01/30.jpg', 1, true),
+   'https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/impianto-civile.jpg', 1, true),
   ('Quadri elettrici', 'Industriale', NULL,
-   'https://www.ziccaservizi.it/wp-content/uploads/2021/01/5-3.jpg', 2, true),
+   'https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/quadri-elettrici.jpg', 2, true),
   ('Impianto produttivo', 'Industriale', NULL,
-   'https://www.ziccaservizi.it/wp-content/uploads/2021/05/JBBG8378.jpg', 3, true),
+   'https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/impianto-produttivo.jpg', 3, true),
   ('Edificio residenziale', 'Civile', NULL,
-   'https://www.ziccaservizi.it/wp-content/uploads/2021/01/31.jpg', 4, true),
+   'https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/edificio-residenziale.jpg', 4, true),
   ('Cabina di trasformazione', 'Industriale', 'Genova',
-   'https://www.ziccaservizi.it/wp-content/uploads/2020/07/4-GENOVA-CT.jpg', 5, true)
+   'https://mrbkuvbxqhwrtnhmpxum.supabase.co/storage/v1/object/public/zicca-media/referenze/cabina-trasformazione-genova.jpg', 5, true)
 ) AS v(title, category, location, image_url, sort_order, published)
 WHERE NOT EXISTS (SELECT 1 FROM zicca.projects);

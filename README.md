@@ -128,7 +128,7 @@ in errore per un problema di connessione.
 
 ## Media
 
-Immagini e video del progetto originale sono stati trasferiti integralmente:
+Immagini, video e foto delle referenze sono stati trasferiti integralmente:
 le immagini (logo, favicon, foto hero/settori/team, logo Milano United) vivono
 nel repository e sono verificate byte per byte; gli 8 video con i rispettivi
 poster stanno nel bucket Supabase `zicca-media` e sono referenziati sia da
@@ -138,9 +138,6 @@ poster stanno nel bucket Supabase `zicca-media` e sono referenziati sia da
 ## Stato della migrazione
 
 Per la messa online e il passaggio al cliente vedi **`CONSEGNA.md`**.
-Codice, database popolato, immagini e video sono completi, e il sito non
-richiede alcuna configurazione per funzionare. Resta un punto aperto:
-
-- **Le sei foto delle referenze** sono ancora ospitate sul vecchio sito
-  WordPress e vanno ricaricate da `/admin` → Referenze prima che il dominio
-  venga puntato su questo sito. Il pannello le segnala da solo. Vedi `DATI.md`.
+Completa. Codice, database popolato, immagini, video e foto delle referenze
+sono tutti in casa: il sito non richiede configurazione per funzionare e non
+dipende né da Lovable né dal vecchio sito WordPress.

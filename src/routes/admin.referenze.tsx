@@ -8,10 +8,10 @@ import { toast } from "sonner";
 import { Pencil, Plus, Trash2, Loader2, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 /**
- * Alcune foto delle referenze sono ancora ospitate sul vecchio sito WordPress:
- * non è stato possibile scaricarle durante la migrazione. Quando il dominio
- * verrà puntato su questo sito quegli indirizzi smetteranno di rispondere e le
- * immagini spariranno, quindi vanno ricaricate da qui prima dello switch.
+ * Le foto delle referenze vivono nel bucket `zicca-media`. Restano però
+ * modificabili dal cliente, che potrebbe reinserire per errore un indirizzo del
+ * vecchio sito WordPress (destinato a sparire): in quel caso il pannello lo
+ * segnala invece di lasciare che l'immagine si rompa in silenzio.
  */
 const LEGACY_IMAGE_HOST = "ziccaservizi.it/wp-content";
 
@@ -108,14 +108,13 @@ function AdminProjects() {
           <div className="text-sm">
             <div className="font-semibold text-amber-900 dark:text-amber-200">
               {legacyCount === 1
-                ? "1 foto è ancora ospitata sul vecchio sito"
-                : `${legacyCount} foto sono ancora ospitate sul vecchio sito`}
+                ? "1 foto punta al vecchio sito"
+                : `${legacyCount} foto puntano al vecchio sito`}
             </div>
             <p className="mt-1 text-amber-900/80 dark:text-amber-200/80">
-              Sono le immagini contrassegnate qui sotto. Finché il vecchio sito
-              resta online si vedono normalmente, ma quando il dominio verrà
-              puntato su questo sito spariranno. Apri ciascuna referenza e
-              ricarica la foto per risolvere definitivamente.
+              Sono le immagini contrassegnate qui sotto. Quel dominio è destinato
+              a puntare su questo sito, quindi quegli indirizzi smetteranno di
+              rispondere. Apri ciascuna referenza e ricarica la foto.
             </p>
           </div>
         </div>

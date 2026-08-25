@@ -81,13 +81,12 @@ sono immediatamente pubblici.
 
 ## 4. Punti aperti
 
-1. **Le sei foto delle referenze** sono ancora ospitate sul vecchio sito
-   WordPress: vanno ricaricate da `/admin` → Referenze **prima** che il dominio
-   venga puntato su questo sito, altrimenti spariscono. Il pannello le segnala
-   da solo con un avviso, quindi non serve ricordarselo. Dettagli in `DATI.md`.
+Nessuno. La piattaforma è completa: codice, database popolato, immagini, video
+e foto delle referenze (`MEDIA.md`), nessuna configurazione richiesta per il
+deploy e nessuna dipendenza residua da Lovable o dal vecchio sito WordPress.
 
-Per il resto la piattaforma è completa: codice, database popolato, immagini e
-video (`MEDIA.md`), e nessuna configurazione richiesta per il deploy.
+Resta facoltativo, se il cliente lo preferisce, rendere privato il repository da
+GitHub → Settings → Danger Zone → Change visibility.
 
 ## 5. Verifiche già effettuate
 
@@ -111,6 +110,8 @@ video (`MEDIA.md`), e nessuna configurazione richiesta per il deploy.
 - Bundle client ispezionato: l'unica chiave presente è quella `anon`.
 - Contenuti caricati nel database e riletti come utente anonimo attraverso le
   RLS: 4 settori, 8 certificazioni e 6 referenze con immagine, tutti visibili.
+- Nessun riferimento residuo al vecchio sito WordPress: le foto delle referenze
+  sono nel bucket `zicca-media` e verificate con md5 rispetto agli originali.
 
 Nota: `npm run lint` segnala 30 avvisi `no-explicit-any` ereditati dal codice
 originale. Non bloccano build né deploy; sono un eventuale intervento di pulizia
