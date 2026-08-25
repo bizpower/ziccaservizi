@@ -1,12 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+import { supabasePublic } from "@/integrations/supabase/client.public";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-// ---------------------- PUBLIC READS (admin client, no RLS issues, only select) ----------------------
+// L'applicazione non usa mai la chiave service role. Le letture pubbliche
+// passano dal client anon (`supabasePublic`), le operazioni di amministrazione
+// dal client autenticato dell'utente (`context.supabase`): in entrambi i casi
+// è il database, con le sue policy RLS, a decidere cosa è permesso.
+
+// ---------------------- LETTURE PUBBLICHE (client anon, solo righe pubblicate) ----------------------
 
 export const getSiteSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin.from("site_settings").select("key, value");
+  const { data, error } = await supabasePublic.from("site_settings").select("key, value");
   if (error) throw error;
   const map: Record<string, any> = {};
   for (const row of data ?? []) map[row.key] = row.value;
@@ -14,7 +21,7 @@ export const getSiteSettings = createServerFn({ method: "GET" }).handler(async (
 });
 
 export const getPublishedSectors = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabasePublic
     .from("sectors")
     .select("*")
     .eq("published", true)
@@ -26,7 +33,7 @@ export const getPublishedSectors = createServerFn({ method: "GET" }).handler(asy
 export const getSectorBySlug = createServerFn({ method: "GET" })
   .inputValidator((d: { slug: string }) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await supabasePublic
       .from("sectors")
       .select("*")
       .eq("slug", data.slug)
@@ -37,7 +44,7 @@ export const getSectorBySlug = createServerFn({ method: "GET" })
   });
 
 export const getPublishedProjects = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabasePublic
     .from("projects")
     .select("*")
     .eq("published", true)
@@ -47,7 +54,7 @@ export const getPublishedProjects = createServerFn({ method: "GET" }).handler(as
 });
 
 export const getPublishedCertifications = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabasePublic
     .from("certifications")
     .select("*")
     .eq("published", true)
@@ -70,13 +77,17 @@ const leadSchema = z.object({
 export const submitLead = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => leadSchema.parse(d))
   .handler(async ({ data }) => {
-    const { error } = await supabaseAdmin.from("leads").insert({
-      name: data.name,
-      email: data.email,
-      phone: data.phone || null,
-      company: data.company || null,
-      subject: data.subject || null,
-      message: data.message,
+    // La tabella `leads` non è scrivibile da anonimo: si passa dalla funzione
+    // SECURITY DEFINER `zicca.submit_lead`, che rivalida i campi lato database
+    // e imposta solo le colonne del form (`status` e `notes` restano ai valori
+    // di default e non sono pilotabili dall'esterno).
+    const { error } = await supabasePublic.rpc("submit_lead", {
+      _name: data.name,
+      _email: data.email,
+      _message: data.message,
+      _phone: data.phone || null,
+      _company: data.company || null,
+      _subject: data.subject || null,
     });
     if (error) {
       console.error("submitLead error", error);
@@ -87,11 +98,15 @@ export const submitLead = createServerFn({ method: "POST" })
 
 // ---------------------- ADMIN: AUTH & ROLE ----------------------
 
-async function ensureAdmin(userId: string) {
-  const { data, error } = await supabaseAdmin
+type AuthedContext = { supabase: SupabaseClient<Database, "zicca">; userId: string };
+
+// Le policy RLS bloccano già le scritture di chi non è admin: questo controllo
+// serve a restituire un errore chiaro invece di un fallimento silenzioso.
+async function ensureAdmin(context: AuthedContext) {
+  const { data, error } = await context.supabase
     .from("user_roles")
     .select("role")
-    .eq("user_id", userId)
+    .eq("user_id", context.userId)
     .eq("role", "admin")
     .maybeSingle();
   if (error) throw error;
@@ -101,7 +116,7 @@ async function ensureAdmin(userId: string) {
 export const checkAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await supabaseAdmin
+    const { data } = await context.supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", context.userId)
@@ -118,8 +133,8 @@ export const upsertSiteSetting = createServerFn({ method: "POST" })
     z.object({ key: z.string().min(1).max(100), value: z.any() }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
-    const { error } = await supabaseAdmin
+    await ensureAdmin(context);
+    const { error } = await context.supabase
       .from("site_settings")
       .upsert({ key: data.key, value: data.value }, { onConflict: "key" });
     if (error) throw error;
@@ -148,8 +163,8 @@ const sectorInput = z.object({
 export const adminListSectors = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await ensureAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
       .from("sectors")
       .select("*")
       .order("sort_order", { ascending: true });
@@ -161,11 +176,11 @@ export const adminSaveSector = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => sectorInput.parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
+    await ensureAdmin(context);
     const payload = { ...data, image_url: data.image_url || null };
     const { error } = data.id
-      ? await supabaseAdmin.from("sectors").update(payload).eq("id", data.id)
-      : await supabaseAdmin.from("sectors").insert(payload);
+      ? await context.supabase.from("sectors").update(payload).eq("id", data.id)
+      : await context.supabase.from("sectors").insert(payload);
     if (error) throw error;
     return { ok: true };
   });
@@ -174,8 +189,8 @@ export const adminDeleteSector = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
-    const { error } = await supabaseAdmin.from("sectors").delete().eq("id", data.id);
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("sectors").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -198,8 +213,8 @@ const projectInput = z.object({
 export const adminListProjects = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await ensureAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
       .from("projects")
       .select("*")
       .order("sort_order", { ascending: true });
@@ -211,11 +226,11 @@ export const adminSaveProject = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => projectInput.parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
+    await ensureAdmin(context);
     const payload = { ...data, image_url: data.image_url || null };
     const { error } = data.id
-      ? await supabaseAdmin.from("projects").update(payload).eq("id", data.id)
-      : await supabaseAdmin.from("projects").insert(payload);
+      ? await context.supabase.from("projects").update(payload).eq("id", data.id)
+      : await context.supabase.from("projects").insert(payload);
     if (error) throw error;
     return { ok: true };
   });
@@ -224,8 +239,8 @@ export const adminDeleteProject = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
-    const { error } = await supabaseAdmin.from("projects").delete().eq("id", data.id);
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("projects").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -247,8 +262,8 @@ const certInput = z.object({
 export const adminListCertifications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await ensureAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
       .from("certifications")
       .select("*")
       .order("sort_order", { ascending: true });
@@ -260,11 +275,11 @@ export const adminSaveCertification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => certInput.parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
+    await ensureAdmin(context);
     const payload = { ...data, pdf_url: data.pdf_url || null, logo_url: data.logo_url || null };
     const { error } = data.id
-      ? await supabaseAdmin.from("certifications").update(payload).eq("id", data.id)
-      : await supabaseAdmin.from("certifications").insert(payload);
+      ? await context.supabase.from("certifications").update(payload).eq("id", data.id)
+      : await context.supabase.from("certifications").insert(payload);
     if (error) throw error;
     return { ok: true };
   });
@@ -273,8 +288,8 @@ export const adminDeleteCertification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
-    const { error } = await supabaseAdmin.from("certifications").delete().eq("id", data.id);
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("certifications").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -284,8 +299,8 @@ export const adminDeleteCertification = createServerFn({ method: "POST" })
 export const adminListLeads = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await ensureAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
       .from("leads")
       .select("*")
       .order("created_at", { ascending: false });
@@ -305,9 +320,9 @@ export const adminUpdateLead = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
+    await ensureAdmin(context);
     const { id, ...patch } = data;
-    const { error } = await supabaseAdmin.from("leads").update(patch).eq("id", id);
+    const { error } = await context.supabase.from("leads").update(patch).eq("id", id);
     if (error) throw error;
     return { ok: true };
   });
@@ -316,8 +331,8 @@ export const adminDeleteLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
-    const { error } = await supabaseAdmin.from("leads").delete().eq("id", data.id);
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("leads").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -346,7 +361,7 @@ export const getCustomSectionsByPage = createServerFn({ method: "GET" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { data: rows, error } = await supabaseAdmin
+    const { data: rows, error } = await supabasePublic
       .from("custom_sections")
       .select("*")
       .eq("page_location", data.page)
@@ -380,8 +395,8 @@ const customSectionInput = z.object({
 export const adminListCustomSections = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await ensureAdmin(context.userId);
-    const { data, error } = await supabaseAdmin
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
       .from("custom_sections")
       .select("*")
       .order("page_location", { ascending: true })
@@ -394,7 +409,7 @@ export const adminSaveCustomSection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => customSectionInput.parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
+    await ensureAdmin(context);
     const payload = {
       ...data,
       image_url: data.image_url || null,
@@ -405,8 +420,8 @@ export const adminSaveCustomSection = createServerFn({ method: "POST" })
       cta_url: data.cta_url || null,
     };
     const { error } = data.id
-      ? await supabaseAdmin.from("custom_sections").update(payload).eq("id", data.id)
-      : await supabaseAdmin.from("custom_sections").insert(payload);
+      ? await context.supabase.from("custom_sections").update(payload).eq("id", data.id)
+      : await context.supabase.from("custom_sections").insert(payload);
     if (error) throw error;
     return { ok: true };
   });
@@ -415,8 +430,8 @@ export const adminDeleteCustomSection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await ensureAdmin(context.userId);
-    const { error } = await supabaseAdmin.from("custom_sections").delete().eq("id", data.id);
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("custom_sections").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -428,16 +443,11 @@ export const adminDeleteCustomSection = createServerFn({ method: "POST" })
 export const claimFirstAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { count, error: cntErr } = await supabaseAdmin
-      .from("user_roles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "admin");
-    if (cntErr) throw cntErr;
-    if ((count ?? 0) > 0) return { claimed: false };
-
-    const { error } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: context.userId, role: "admin" });
+    // `user_roles` non ha policy di INSERT: l'assegnazione passa dalla funzione
+    // SECURITY DEFINER `zicca.claim_first_admin`, che assegna il ruolo a chi
+    // chiama solo se non esiste ancora alcun amministratore (con lock, così due
+    // richieste simultanee non diventano entrambe admin).
+    const { data, error } = await context.supabase.rpc("claim_first_admin");
     if (error) throw error;
-    return { claimed: true };
+    return { claimed: data === true };
   });

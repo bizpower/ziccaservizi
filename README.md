@@ -28,7 +28,7 @@ src/
   components/admin/    MediaUpload (upload su Supabase Storage)
   components/ui/       componenti shadcn/ui
   lib/content.functions.ts  server functions (letture pubbliche, invio lead, CRUD admin)
-  integrations/supabase/    client browser, client service-role, middleware auth, tipi DB
+  integrations/supabase/    config, client browser, client pubblico SSR, middleware auth, tipi DB
 supabase/migrations/   schema del database (tabelle, RLS, bucket storage)
 ```
 
@@ -42,12 +42,16 @@ npm run dev               # http://localhost:8080
 
 ## Variabili d'ambiente
 
-Vedi `.env.example`. In produzione vanno impostate tra le Environment Variables
-del progetto Vercel; le `VITE_*` sono inserite nel bundle a build time, quindi
-devono essere presenti anche in fase di build.
+**Non servono.** URL e chiave publishable (anon) del progetto sono in
+`src/integrations/supabase/config.ts`: sono valori pubblici, che finiscono
+comunque nel bundle servito al browser, quindi il sito funziona appena
+deployato senza configurare nulla.
 
-`SUPABASE_SERVICE_ROLE_KEY` è usata **solo** lato server (`client.server.ts`) e
-non deve mai finire nel bundle client.
+Le variabili di `.env.example` sono facoltative e servono solo a puntare a un
+altro progetto Supabase (staging, fork del cliente).
+
+L'applicazione **non usa la service role**: non esiste alcuna chiave segreta.
+Le autorizzazioni sono interamente demandate al database (vedi sotto).
 
 ## Database
 
@@ -60,8 +64,9 @@ bucket **`zicca-media`**:
 - `zicca.user_roles` + funzione `zicca.has_role` (ruolo admin)
 - `zicca.site_settings`, `zicca.sectors`, `zicca.projects`,
   `zicca.certifications`, `zicca.leads`, `zicca.custom_sections`
-- RLS attiva su tutte le tabelle; le scritture applicative passano dalle server
-  function con client service role
+- RLS attiva su tutte le tabelle. Nessun client bypassa le policy: le letture
+  pubbliche usano la chiave anon, le operazioni di amministrazione usano il
+  token dell'utente collegato, quindi è il database a decidere cosa è permesso
 - lo schema `zicca` è esposto a PostgREST
   (`pgrst.db_schemas = public, graphql_public, zicca`) e i client Supabase sono
   configurati con `db: { schema: "zicca" }`
@@ -73,8 +78,17 @@ npx supabase link --project-ref <project-ref>
 npx supabase db push
 ```
 
-Il primo utente registrato può auto-assegnarsi il ruolo admin dalla pagina
-`/admin` (funzione `claimFirstAdmin`, attiva solo finché non esiste alcun admin).
+Due operazioni non sarebbero esprimibili con le sole policy e passano da
+funzioni `SECURITY DEFINER`, così che nessuna tabella debba essere aperta in
+scrittura:
+
+- `zicca.submit_lead(...)` — l'invio di una richiesta dal form contatti
+  (eseguibile da `anon`); rivalida i campi e scrive solo le colonne del form,
+  mentre `leads` resta non scrivibile direttamente;
+- `zicca.claim_first_admin()` — il primo utente registrato si auto-assegna il
+  ruolo admin dalla pagina `/admin`, solo finché non esiste alcun
+  amministratore; un lock evita che due richieste simultanee diventino
+  entrambe admin.
 
 ## Build e deploy (Vercel)
 
@@ -88,8 +102,7 @@ e genera `.vercel/output` (Build Output API v3). Impostazioni del progetto Verce
 - Framework preset: **Other**
 - Build command: `npm run build`
 - Output directory: lasciare vuoto (rilevato automaticamente)
-- Environment variables: quelle di `.env.example` (comprese le `VITE_*`,
-  necessarie anche in fase di build)
+- Environment variables: nessuna (vedi «Variabili d'ambiente»)
 
 Il dominio del cliente si collega poi da Vercel → Project → Domains.
 
@@ -124,13 +137,9 @@ poster stanno nel bucket Supabase `zicca-media` e sono referenziati sia da
 ## Stato della migrazione
 
 Per la messa online e il passaggio al cliente vedi **`CONSEGNA.md`**.
-Codice, schema del database, immagini e video sono completi. Restano tre
-passaggi manuali:
+Codice, schema del database, immagini e video sono completi, e il sito non
+richiede alcuna configurazione per funzionare. Restano due punti aperti:
 
-- **Variabili d'ambiente su Vercel**: progetto `ziccaservizi`
-  (team Bizpower SRL) già collegato a questo repository, branch di produzione
-  `main`. Prima del primo deploy vanno inserite le variabili di `.env.example`,
-  inclusa `SUPABASE_SERVICE_ROLE_KEY`.
 - **Dati del vecchio database** → `DATI.md`: il backend Lovable Cloud non era
   raggiungibile al momento della migrazione; il nuovo schema è pronto e vuoto e
   il sito usa i contenuti predefiniti.

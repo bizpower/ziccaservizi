@@ -2,22 +2,10 @@ import { createMiddleware } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./config";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
-
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-      const missing = [
-        ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-        ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-      ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Check the .env file (see .env.example).`;
-      console.error(`[Supabase] ${message}`);
-      throw new Error(message);
-    }
-
     const request = getRequest();
 
     if (!request?.headers) {
@@ -39,7 +27,10 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: No token provided");
     }
 
-    const supabase = createClient<Database, "zicca">(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+    // Client che agisce *per conto dell'utente*: ogni query passa dalle policy
+    // RLS con il suo `auth.uid()`, quindi le autorizzazioni sono applicate dal
+    // database e non dal codice applicativo.
+    const supabase = createClient<Database, "zicca">(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       db: { schema: "zicca" },
       global: {
         headers: {

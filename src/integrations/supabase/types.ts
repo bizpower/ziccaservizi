@@ -283,12 +283,27 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      claim_first_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
       has_role: {
         Args: {
           _role: Database["zicca"]["Enums"]["app_role"];
           _user_id: string;
         };
         Returns: boolean;
+      };
+      submit_lead: {
+        Args: {
+          _company?: string | null;
+          _email: string;
+          _message: string;
+          _name: string;
+          _phone?: string | null;
+          _subject?: string | null;
+        };
+        Returns: undefined;
       };
     };
     Enums: {
