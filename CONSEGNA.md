@@ -99,16 +99,36 @@ Se si vuole il recupero password via email, va configurato un SMTP proprio in
 Supabase → Authentication → Emails: quello di default è limitato e pensato per
 i test.
 
-### f) Chi riceve le richieste dal form
+### f) Notifica email delle richieste
 
-**Da decidere.** Oggi le richieste inviate da `/contatti` vengono salvate nel
-database e si leggono da `/admin` → Richieste: **non parte alcuna email**. Se
-nessuno apre il pannello, una richiesta resta inosservata.
+Il meccanismo **è già costruito e attivo**. Ogni richiesta inviata dal form fa
+partire un'email ai destinatari configurati, oltre a essere salvata in
+`/admin` → Richieste.
 
-Le opzioni sono due:
-- il cliente prende l'abitudine di controllare il pannello;
-- si aggiunge una notifica via email (una Edge Function Supabase con un
-  provider tipo Resend), che richiede un account del provider e una chiave.
+L'invio parte da un trigger sul database, non dal sito: la notifica parte da
+qualunque punto arrivi la richiesta, la chiave del provider resta su Supabase
+(su Vercel non serve configurare niente) e un errore di invio non fa mai perdere
+la richiesta.
+
+Mancano due cose, entrambe da fare una volta sola:
+
+1. **Account del provider di invio.** È configurato per [Resend](https://resend.com)
+   (piano gratuito: 3.000 email/mese, ampiamente sufficiente). Serve creare
+   l'account, verificare il dominio `ziccaservizi.it` inserendo i record DNS che
+   Resend indica (SPF/DKIM), e generare una API key.
+2. **Inserire la chiave in Supabase.** Dashboard → Project Settings → Vault →
+   New secret, con nome esatto **`RESEND_API_KEY`** e come valore la chiave.
+
+Poi si impostano i destinatari da `/admin` → Contenuti sito → «Notifica email
+delle richieste»: si aggiungono uno o più indirizzi, si può cambiare mittente e
+prefisso dell'oggetto, e si può disattivare del tutto l'invio.
+
+Finché manca la chiave o l'elenco dei destinatari è vuoto, il trigger non fa
+nulla e le richieste continuano a salvarsi normalmente: il sito non si rompe in
+nessun caso.
+
+> Senza verifica del dominio presso il provider le email non partono (o
+> finiscono in spam): è il passaggio che richiede l'accesso al DNS del cliente.
 
 ## 3. Cosa può fare il cliente dal pannello
 
@@ -119,7 +139,7 @@ Le opzioni sono due:
 | **Referenze**      | Pilota la gallery di `/referenze`, con filtro per categoria                                                          |
 | **Certificazioni** | Pilota le schede di `/certificazioni`, con link al PDF quando caricato                                               |
 | **Sezioni custom** | Aggiunge blocchi liberi (titolo, testo markdown, immagine, pulsante) a qualsiasi pagina, con ordine e stile          |
-| **Contenuti sito** | Video e immagine di sfondo della home, **gallery video di home e Milano United** (già popolate), numeri animati, recapiti aziendali |
+| **Contenuti sito** | Video e immagine di sfondo della home, **gallery video di home e Milano United** (già popolate), numeri animati, recapiti aziendali, **destinatari delle notifiche email** |
 
 Settori, referenze e certificazioni sono **già compilati**: il cliente li trova
 pronti nel pannello e può modificarli, riordinarli o cancellarli.
@@ -145,7 +165,8 @@ Restano operazioni di messa in esercizio, tutte fuori dal codice:
 | 3 | `SITE_URL` prima dello switch     | consigliato  | §2c               |
 | 4 | Redirect 301 dalle vecchie pagine | consigliato  | §2d               |
 | 5 | Leaked password protection        | consigliato  | §2e               |
-| 6 | Chi riceve le richieste dal form  | **da decidere** | §2f            |
+| 6 | Account Resend + `RESEND_API_KEY` | **sì**, per le notifiche | §2f    |
+| 7 | Destinatari delle notifiche       | **sì**, per le notifiche | pannello admin |
 
 Facoltativo: rendere privato il repository da GitHub → Settings → Danger Zone →
 Change visibility.
@@ -174,6 +195,10 @@ Change visibility.
   `og:image` assoluti, `robots.txt` con la riga `Sitemap`.
 - Analisi di sicurezza Supabase: nessun rilievo sullo schema `zicca`; tutte le
   tabelle hanno RLS attiva.
+- Notifica delle richieste provata sul database: con destinatari configurati ma
+  chiave assente, e con HTML ostile nel contenuto, la richiesta viene comunque
+  salvata e il trigger non solleva errori. L'escape HTML del contenuto è stato
+  verificato: `<script>` viene neutralizzato.
 - Contenuti caricati nel database e riletti come utente anonimo attraverso le
   RLS: 4 settori, 8 certificazioni e 6 referenze con immagine, tutti visibili.
 - Nessun riferimento residuo al vecchio sito WordPress: le foto delle referenze
