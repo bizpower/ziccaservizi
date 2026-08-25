@@ -59,6 +59,57 @@ Vercel → progetto → Settings → Domains → Add. Vercel indica i record DNS
 (di norma un `A` sulla radice e un `CNAME` su `www`) da inserire presso il
 registrar del cliente. Il certificato HTTPS è automatico.
 
+**Prima dello switch**, finché il sito risponde su `*.vercel.app` mentre il
+dominio serve ancora il vecchio WordPress, conviene impostare su Vercel:
+
+```
+SITE_URL       = https://<progetto>.vercel.app
+VITE_SITE_URL  = https://<progetto>.vercel.app
+```
+
+così sitemap, link canonici e anteprime social puntano dove il sito risponde
+davvero. **Dopo lo switch queste due variabili vanno rimosse**: il default nel
+codice è già `https://www.ziccaservizi.it`.
+
+### d) Redirect dalle vecchie pagine WordPress
+
+Gli indirizzi del vecchio sito (`/chi-siamo`, `/contatti-2`, gli articoli…) non
+esistono in questo sito: dopo lo switch risponderebbero 404, perdendo il
+posizionamento già acquisito. Conviene mappare i principali con redirect 301 in
+`vercel.json`, per esempio:
+
+```json
+{
+  "redirects": [
+    { "source": "/chi-siamo", "destination": "/azienda", "permanent": true }
+  ]
+}
+```
+
+L'elenco degli indirizzi da mappare si ricava dalla Search Console del cliente o
+dalla sitemap del vecchio sito, finché è ancora online.
+
+### e) Sicurezza dell'accesso admin
+
+Supabase → Authentication → Providers → Password: attivare **Leaked password
+protection** (confronto con HaveIBeenPwned). È l'unico rilievo di sicurezza
+segnalato dall'analisi Supabase che riguardi questo sito.
+
+Se si vuole il recupero password via email, va configurato un SMTP proprio in
+Supabase → Authentication → Emails: quello di default è limitato e pensato per
+i test.
+
+### f) Chi riceve le richieste dal form
+
+**Da decidere.** Oggi le richieste inviate da `/contatti` vengono salvate nel
+database e si leggono da `/admin` → Richieste: **non parte alcuna email**. Se
+nessuno apre il pannello, una richiesta resta inosservata.
+
+Le opzioni sono due:
+- il cliente prende l'abitudine di controllare il pannello;
+- si aggiunge una notifica via email (una Edge Function Supabase con un
+  provider tipo Resend), che richiede un account del provider e una chiave.
+
 ## 3. Cosa può fare il cliente dal pannello
 
 | Sezione admin      | Effetto sul sito                                                                                                     |
@@ -79,14 +130,25 @@ contenuti predefiniti presenti nel codice: **non resta mai una pagina spoglia**.
 Gli upload di immagini e PDF dal pannello finiscono nel bucket `zicca-media` e
 sono immediatamente pubblici.
 
-## 4. Punti aperti
+## 4. Riepilogo: cosa manca per andare online
 
-Nessuno. La piattaforma è completa: codice, database popolato, immagini, video
-e foto delle referenze (`MEDIA.md`), nessuna configurazione richiesta per il
-deploy e nessuna dipendenza residua da Lovable o dal vecchio sito WordPress.
+Sul **prodotto** non manca nulla. Codice, database popolato, immagini, video e
+foto delle referenze (`MEDIA.md`) sono completi, non serve configurare variabili
+per il deploy e non resta alcuna dipendenza da Lovable o dal vecchio WordPress.
 
-Resta facoltativo, se il cliente lo preferisce, rendere privato il repository da
-GitHub → Settings → Danger Zone → Change visibility.
+Restano operazioni di messa in esercizio, tutte fuori dal codice:
+
+| # | Cosa                              | Obbligatorio | Dove              |
+| - | --------------------------------- | ------------ | ----------------- |
+| 1 | Primo amministratore              | **sì**       | §2b               |
+| 2 | Dominio + DNS                     | **sì**       | §2c               |
+| 3 | `SITE_URL` prima dello switch     | consigliato  | §2c               |
+| 4 | Redirect 301 dalle vecchie pagine | consigliato  | §2d               |
+| 5 | Leaked password protection        | consigliato  | §2e               |
+| 6 | Chi riceve le richieste dal form  | **da decidere** | §2f            |
+
+Facoltativo: rendere privato il repository da GitHub → Settings → Danger Zone →
+Change visibility.
 
 ## 5. Verifiche già effettuate
 
@@ -108,6 +170,10 @@ GitHub → Settings → Danger Zone → Change visibility.
   `zicca.submit_lead` funziona, le richieste ricevute non sono leggibili
   (0 righe visibili), `zicca.claim_first_admin` non è eseguibile da anonimo.
 - Bundle client ispezionato: l'unica chiave presente è quella `anon`.
+- Sitemap servita con URL assoluti (11 indirizzi), link canonici, `og:url` e
+  `og:image` assoluti, `robots.txt` con la riga `Sitemap`.
+- Analisi di sicurezza Supabase: nessun rilievo sullo schema `zicca`; tutte le
+  tabelle hanno RLS attiva.
 - Contenuti caricati nel database e riletti come utente anonimo attraverso le
   RLS: 4 settori, 8 certificazioni e 6 referenze con immagine, tutti visibili.
 - Nessun riferimento residuo al vecchio sito WordPress: le foto delle referenze
