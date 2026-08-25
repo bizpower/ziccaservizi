@@ -4,6 +4,7 @@ import { ArrowUpRight, Target, Eye, Heart } from "lucide-react";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import teamImg from "@/assets/team.jpg";
 import heroImg from "@/assets/hero-industrial.jpg";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/azienda")({
   head: () => ({
@@ -15,9 +16,9 @@ export const Route = createFileRoute("/azienda")({
           "Storia, mission, vision e team di Zicca Servizi: dal 1998 un partner italiano per impianti tecnologici e edilizia integrata.",
       },
       { property: "og:title", content: "Azienda — Zicca Servizi" },
-      { property: "og:url", content: "/azienda" },
+      { property: "og:url", content: absoluteUrl("/azienda") },
     ],
-    links: [{ rel: "canonical", href: "/azienda" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/azienda") }],
   }),
   component: AziendaPage,
 });

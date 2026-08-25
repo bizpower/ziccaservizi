@@ -15,6 +15,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { SITE_URL, OG_IMAGE, absoluteUrl } from "@/lib/site-url";
 
 function NotFoundComponent() {
   return (
@@ -92,7 +93,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Zicca Servizi" },
+      { property: "og:locale", content: "it_IT" },
+      { property: "og:image", content: OG_IMAGE },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -111,8 +115,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "Zicca Servizi S.r.l.",
-          url: "/",
-          logo: "/logo-zicca.png",
+          url: SITE_URL,
+          logo: absoluteUrl("/logo-zicca.png"),
           email: "info@ziccaservizi.it",
           telephone: "+39 02 55230921",
           vatID: "IT07396810960",
