@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight } from "lucide-react";
 import { getPublishedSectors } from "@/lib/content.functions";
 import { toSectorViews } from "@/lib/sector-content";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/settori/")({
   head: () => ({
@@ -16,9 +17,9 @@ export const Route = createFileRoute("/settori/")({
           "Impianti tecnologici, edilizia, manutenzione e progettazione: i quattro settori operativi di Zicca Servizi.",
       },
       { property: "og:title", content: "Settori operativi — Zicca Servizi" },
-      { property: "og:url", content: "/settori" },
+      { property: "og:url", content: absoluteUrl("/settori") },
     ],
-    links: [{ rel: "canonical", href: "/settori" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/settori") }],
   }),
   component: SettoriPage,
 });

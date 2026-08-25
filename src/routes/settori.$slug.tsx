@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowUpRight, Check } from "lucide-react";
 import { sectors as staticSectors } from "@/data/sectors";
 import { getSectorBySlug } from "@/lib/content.functions";
 import { sectorFromRow, sectorFromStatic, type SectorView } from "@/lib/sector-content";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/settori/$slug")({
   loader: async ({ params }): Promise<{ sector: SectorView }> => {
@@ -27,10 +28,12 @@ export const Route = createFileRoute("/settori/$slug")({
           { title: `${loaderData.sector.title} — Zicca Servizi` },
           { name: "description", content: loaderData.sector.short },
           { property: "og:title", content: loaderData.sector.title },
-          { property: "og:url", content: `/settori/${loaderData.sector.slug}` },
+          { property: "og:url", content: absoluteUrl(`/settori/${loaderData.sector.slug}`) },
         ]
       : [],
-    links: loaderData ? [{ rel: "canonical", href: `/settori/${loaderData.sector.slug}` }] : [],
+    links: loaderData
+      ? [{ rel: "canonical", href: absoluteUrl(`/settori/${loaderData.sector.slug}`) }]
+      : [],
   }),
   notFoundComponent: () => (
     <div className="container-px mx-auto max-w-7xl pt-40 pb-20">

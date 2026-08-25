@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { getPublishedProjects } from "@/lib/content.functions";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/referenze")({
   head: () => ({
@@ -16,9 +17,9 @@ export const Route = createFileRoute("/referenze")({
           "Una selezione dei cantieri e delle referenze di Zicca Servizi: impianti civili, industriali e ristrutturazioni.",
       },
       { property: "og:title", content: "Referenze — Zicca Servizi" },
-      { property: "og:url", content: "/referenze" },
+      { property: "og:url", content: absoluteUrl("/referenze") },
     ],
-    links: [{ rel: "canonical", href: "/referenze" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/referenze") }],
   }),
   component: ReferenzePage,
 });

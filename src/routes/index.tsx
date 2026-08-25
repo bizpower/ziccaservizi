@@ -23,6 +23,7 @@ import teamImg from "@/assets/team.jpg";
 import ctaBg from "@/assets/cta-bg.jpg";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { toSectorViews } from "@/lib/sector-content";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,9 +40,9 @@ export const Route = createFileRoute("/")({
         content:
           "Progettazione, installazione, manutenzione e gestione di impianti tecnologici civili e industriali.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
     scripts: [
       {
         type: "application/ld+json",

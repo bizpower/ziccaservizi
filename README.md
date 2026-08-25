@@ -28,6 +28,7 @@ src/
   components/admin/    MediaUpload (upload su Supabase Storage)
   components/ui/       componenti shadcn/ui
   lib/content.functions.ts  server functions (letture pubbliche, invio lead, CRUD admin)
+  lib/site-url.ts           indirizzo pubblico del sito (sitemap, canonical, social)
   integrations/supabase/    config, client browser, client pubblico SSR, middleware auth, tipi DB
 supabase/migrations/   schema del database (tabelle, RLS, bucket storage)
 ```
@@ -47,8 +48,10 @@ npm run dev               # http://localhost:8080
 comunque nel bundle servito al browser, quindi il sito funziona appena
 deployato senza configurare nulla.
 
-Le variabili di `.env.example` sono facoltative e servono solo a puntare a un
-altro progetto Supabase (staging, fork del cliente).
+Le variabili di `.env.example` sono facoltative: servono a puntare a un altro
+progetto Supabase (staging, fork del cliente) oppure a cambiare l'indirizzo
+pubblico del sito con `SITE_URL` / `VITE_SITE_URL` — utile finché il dominio
+non è stato commutato e il sito risponde su `*.vercel.app`.
 
 L'applicazione **non usa la service role**: non esiste alcuna chiave segreta.
 Le autorizzazioni sono interamente demandate al database (vedi sotto).

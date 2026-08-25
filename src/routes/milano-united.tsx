@@ -12,6 +12,7 @@ import challVid from "@/assets/milano-united/challenge-2.mp4.asset.json";
 import challPoster from "@/assets/milano-united/challenge-2-poster.jpg.asset.json";
 import veroVid from "@/assets/milano-united/vero-calcio.mp4.asset.json";
 import veroPoster from "@/assets/milano-united/vero-calcio-poster.jpg.asset.json";
+import { absoluteUrl } from "@/lib/site-url";
 
 const manifestVideos: VideoItem[] = [
   {
@@ -142,10 +143,10 @@ export const Route = createFileRoute("/milano-united")({
             "Rosa, formazione e video highlights di Milano United, Campionato Sportland Serie B1 Milano.",
         },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: "/milano-united" },
+        { property: "og:url", content: absoluteUrl("/milano-united") },
         { name: "twitter:card", content: "summary_large_image" },
       ],
-      links: [{ rel: "canonical", href: "/milano-united" }],
+      links: [{ rel: "canonical", href: absoluteUrl("/milano-united") }],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(teamLd) },
         { type: "application/ld+json", children: JSON.stringify(crumbs) },

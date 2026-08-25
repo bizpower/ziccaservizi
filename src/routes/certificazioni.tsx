@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Award, Download, ShieldCheck } from "lucide-react";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { getPublishedCertifications } from "@/lib/content.functions";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/certificazioni")({
   head: () => ({
@@ -16,9 +17,9 @@ export const Route = createFileRoute("/certificazioni")({
           "Le certificazioni di Zicca Servizi: ISO 9001, ISO 14001, ISO 45001, SOA, ICIM e abilitazioni F-Gas.",
       },
       { property: "og:title", content: "Certificazioni — Zicca Servizi" },
-      { property: "og:url", content: "/certificazioni" },
+      { property: "og:url", content: absoluteUrl("/certificazioni") },
     ],
-    links: [{ rel: "canonical", href: "/certificazioni" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/certificazioni") }],
   }),
   component: CertificazioniPage,
 });

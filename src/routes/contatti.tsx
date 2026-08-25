@@ -6,6 +6,7 @@ import { Mail, MapPin, Phone, Send, MessageCircle, AlertCircle, Loader2 } from "
 import { z } from "zod";
 import { submitLead } from "@/lib/content.functions";
 import { toast } from "sonner";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -17,9 +18,9 @@ export const Route = createFileRoute("/contatti")({
           "Contatta Zicca Servizi: sedi a Milano (San Donato Milanese) e Torino. Telefono, email e modulo per richieste e preventivi.",
       },
       { property: "og:title", content: "Contatti — Zicca Servizi" },
-      { property: "og:url", content: "/contatti" },
+      { property: "og:url", content: absoluteUrl("/contatti") },
     ],
-    links: [{ rel: "canonical", href: "/contatti" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/contatti") }],
   }),
   component: ContattiPage,
 });
