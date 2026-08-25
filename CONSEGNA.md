@@ -17,26 +17,27 @@ il controllo del proprietario del repository.
 
 ## 2. Prima della messa online — da fare una volta sola
 
-### a) Variabili d'ambiente su Vercel
+### a) Variabili d'ambiente su Vercel — non servono
 
-Vercel → progetto `ziccaservizi` → Settings → Environment Variables. Inserire
-per **Production** (e Preview, se si vogliono anteprime funzionanti) tutte le
-variabili elencate in `.env.example`:
+Non c'è niente da configurare: il sito si collega al progetto Supabase con URL
+e chiave publishable (anon) già presenti nel codice
+(`src/integrations/supabase/config.ts`). Sono valori pubblici per definizione,
+perché finiscono comunque nel JavaScript servito al browser.
 
-```
-SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_PROJECT_ID,
-SUPABASE_SERVICE_ROLE_KEY,
-VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID
-```
+L'applicazione **non usa alcuna chiave segreta**: non esiste più una service
+role da custodire. Chi può fare cosa lo decide il database, tramite le policy
+RLS dello schema `zicca` e due funzioni `SECURITY DEFINER`:
 
-URL e chiave anon sono già compilati in `.env.example`; la **service role** si
-copia da Supabase → Settings → API. È l'unica chiave segreta: non va mai messa
-nel repository né in variabili con prefisso `VITE_`.
+| Operazione                             | Chi la può fare | Come                             |
+| -------------------------------------- | ---------------- | -------------------------------- |
+| Leggere i contenuti pubblicati         | chiunque         | policy RLS di lettura pubblica   |
+| Inviare una richiesta dal form         | chiunque         | `zicca.submit_lead(...)`         |
+| Leggere le richieste ricevute          | solo admin       | policy RLS                       |
+| Modificare i contenuti dal pannello    | solo admin       | policy RLS                       |
+| Diventare il primo amministratore      | primo utente     | `zicca.claim_first_admin()`      |
 
-> Senza queste variabili il sito viene compilato correttamente ma va in errore
-> nel browser: è la prima cosa da fare.
-
-Dopo averle inserite: Deployments → ultimo deployment → Redeploy.
+Le variabili di `.env.example` restano disponibili, ma servono soltanto per
+puntare il sito a un altro progetto Supabase.
 
 ### b) Primo amministratore
 
@@ -78,15 +79,12 @@ sono immediatamente pubblici.
 
 ## 4. Punti aperti
 
-1. **Variabili d'ambiente su Vercel** — vanno inserite a mano (punto 2a): il
-   token di questa migrazione non ha i permessi per scriverle. È l'unico
-   passaggio obbligatorio prima del primo deploy.
-2. **Dati del vecchio database** (`DATI.md`) — al momento della migrazione il
+1. **Dati del vecchio database** (`DATI.md`) — al momento della migrazione il
    backend Lovable Cloud non era raggiungibile, quindi i contenuti inseriti da
    Lovable non sono stati esportati. Le tabelle nuove sono vuote e il sito usa i
    contenuti predefiniti del codice: il cliente può ripopolarle dal pannello
    admin, oppure si riprova l'export quando Lovable torna disponibile.
-3. **Repository pubblico** — se il cliente preferisce, va reso privato da
+2. **Repository pubblico** — se il cliente preferisce, va reso privato da
    GitHub → Settings → Danger Zone → Change visibility.
 
 Video e immagini sono invece **completi**: vedi `MEDIA.md`.
@@ -103,6 +101,14 @@ Video e immagini sono invece **completi**: vedi `MEDIA.md`.
   verificate in SSR (5 video in home, 3 su Milano United).
 - Schema `zicca` applicato con RLS attiva su tutte le tabelle; lettura pubblica
   limitata ai contenuti pubblicati, scritture riservate agli amministratori.
+- Sito verificato **senza alcuna variabile d'ambiente** e con il database
+  irraggiungibile: tutte le rotte rispondono 200 e mostrano i contenuti
+  predefiniti, nessun errore in console.
+- Permessi verificati sul database interrogandolo come utente anonimo:
+  l'inserimento diretto in `leads` è respinto dalle RLS, l'invio dal form via
+  `zicca.submit_lead` funziona, le richieste ricevute non sono leggibili
+  (0 righe visibili), `zicca.claim_first_admin` non è eseguibile da anonimo.
+- Bundle client ispezionato: l'unica chiave presente è quella `anon`.
 
 Nota: `npm run lint` segnala 30 avvisi `no-explicit-any` ereditati dal codice
 originale. Non bloccano build né deploy; sono un eventuale intervento di pulizia
@@ -114,5 +120,7 @@ successivo.
 - **Modifiche ai contenuti**: dal pannello admin, senza deploy.
 - **Backup database**: Supabase → Database → Backups (giornalieri sul piano a
   pagamento; sul piano Free conviene un export periodico).
-- **Chiavi**: se la service role viene rigenerata, aggiornare la variabile su
-  Vercel e rifare il deploy.
+- **Chiavi**: nessuna chiave segreta da custodire. Se in Supabase viene
+  ruotata la chiave anon, si aggiorna il valore in
+  `src/integrations/supabase/config.ts` (o si imposta `VITE_SUPABASE_PUBLISHABLE_KEY`
+  su Vercel) e si rifà il deploy.
