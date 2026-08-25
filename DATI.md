@@ -1,9 +1,14 @@
 # Dati del vecchio database (Lovable Cloud) — stato e procedura di import
 
-Il nuovo database (`zicca` su progetto Supabase `mrbkuvbxqhwrtnhmpxum`) è creato e
-funzionante, ma **vuoto**: al momento della migrazione non è stato possibile
-leggere i dati dal database Lovable Cloud del progetto originale
-(`hpssrhbdypupfpyrukcx`).
+**Stato: chiuso.** Il nuovo database è popolato e il sito non dipende più da
+Lovable in alcun modo. Il vecchio database non è mai tornato raggiungibile e
+non lo si aspetta più: continuare a dipenderne sarebbe esso stesso una forma di
+dipendenza da Lovable.
+
+Al momento della migrazione non è stato possibile leggere i dati dal database
+Lovable Cloud del progetto originale (`hpssrhbdypupfpyrukcx`), che vive
+nell'organizzazione Supabase gestita da Lovable e non è quindi raggiungibile
+nemmeno direttamente con le credenziali del cliente.
 
 Tentativi effettuati (20/08/2026):
 
@@ -39,25 +44,47 @@ bun scripts/export-db.mjs        # scrive _export/db-export.json
 Attenzione: l'output contiene la tabella `leads` con dati personali, quindi non
 va scritto in `public/` né pubblicato.
 
-## 1. Esportare i dati da Lovable
+## 1. Come è stato risolto
 
-Nell'editor Lovable del progetto “Zicca Servizi SRL”:
-**Cloud → Advanced settings → Export data** (export completo del database).
+I contenuti reali del sito erano già nel repository, usati come fallback quando
+il database era vuoto. Con la migrazione
+`20260825100000_zicca_seed_contenuti.sql` sono stati scritti nel database, che
+diventa così l'unica fonte autorevole:
 
-In alternativa, quando il backend torna raggiungibile, bastano queste SELECT:
+| Tabella                | Righe | Origine                         |
+| ---------------------- | ----- | ------------------------------- |
+| `zicca.sectors`        | 4     | `src/data/sectors.ts`           |
+| `zicca.certifications` | 8     | `src/routes/certificazioni.tsx` |
+| `zicca.projects`       | 6     | `src/routes/referenze.tsx`      |
+| `zicca.site_settings`  | 2     | gallery video (già popolate)    |
 
-```sql
-select * from public.site_settings order by key;
-select * from public.sectors order by sort_order;
-select * from public.projects order by sort_order;
-select * from public.certifications order by sort_order;
-select * from public.custom_sections order by page_location, sort_order;
-select * from public.leads order by created_at;
-select ur.user_id, ur.role, u.email from public.user_roles ur
-  join auth.users u on u.id = ur.user_id;
-```
+Effetto pratico: il pannello admin non è più vuoto. Il cliente apre `/admin` e
+trova settori, referenze e certificazioni già compilati, da modificare,
+riordinare o cancellare. I fallback nel codice restano come rete di sicurezza
+se il database non risponde.
 
-## 2. Importare nel nuovo database
+La migrazione è idempotente: ogni blocco scrive solo se la tabella è ancora
+vuota, quindi rilanciarla non duplica né sovrascrive il lavoro del cliente.
+
+### Un punto da chiudere prima dello switch del dominio
+
+Le sei foto delle referenze sono ancora ospitate sul **vecchio sito WordPress**
+(`www.ziccaservizi.it/wp-content/...`): non è stato possibile scaricarle
+dall'ambiente di migrazione, che non ha accesso di rete a quel dominio.
+
+Finché il vecchio sito resta online si vedono normalmente, ma quando il dominio
+verrà puntato su questo sito spariranno. Vanno quindi ricaricate da
+`/admin` → Referenze **prima** dello switch. Il pannello se ne accorge da solo:
+mostra un avviso in cima all'elenco e contrassegna le singole righe ancora
+agganciate al vecchio sito, così il passaggio non può essere dimenticato.
+
+## 2. Se un giorno il vecchio database tornasse raggiungibile
+
+Non serve a far funzionare il sito: sarebbe solo un recupero dello storico, per
+esempio le richieste di contatto ricevute nel periodo in cui il sito girava su
+Lovable. Nel progetto Lovable è rimasto pronto `scripts/export-db.mjs`.
+
+### Importare l'export nel nuovo database
 
 Le tabelle hanno le stesse colonne: cambia solo lo schema
 (`public.<tabella>` → `zicca.<tabella>`). Esempio con un file JSON di export:
@@ -94,9 +121,8 @@ Ordine consigliato: `site_settings`, `sectors`, `projects`, `certifications`,
   `custom_sections.image_url` e per le chiavi `hero.video_url` /
   `hero.poster_url` dentro `site_settings`).
 
-## 3. Cosa funziona già senza questi dati
+## 3. Cosa funziona senza il vecchio database
 
-Tutte le pagine pubbliche: i contenuti di home, azienda, settori, referenze e
-certificazioni sono nel codice (`src/data/sectors.ts` e i dati nelle rotte). Dal
-database dipendono solo: le sezioni personalizzate, il video di sfondo della
-home, le voci gestite da pannello admin e lo storico delle richieste di contatto.
+Tutto. Il sito è completo e interamente gestibile dal pannello. Dal vecchio
+database dipenderebbe soltanto lo storico delle richieste di contatto arrivate
+mentre il sito girava su Lovable.

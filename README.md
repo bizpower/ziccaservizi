@@ -112,9 +112,10 @@ Per cambiare piattaforma basta il preset Nitro corrispondente
 ## Contenuti gestiti dal pannello
 
 Settori, referenze e certificazioni sono letti dal database (tabelle `zicca.*`,
-gestite da `/admin`) e ricadono sull'elenco statico presente nel codice quando
-la tabella è vuota o il database non risponde: il sito non resta mai spoglio e
-non va in errore per un problema di connessione al database.
+gestite da `/admin`), che è **già popolato** con i contenuti del sito. Se una
+tabella venisse svuotata, o il database non rispondesse, le pagine ricadono
+sull'elenco statico presente nel codice: il sito non resta mai spoglio e non va
+in errore per un problema di connessione.
 
 | Pagina                               | Sorgente dinamica                                        | Fallback                                            |
 | ------------------------------------ | -------------------------------------------------------- | --------------------------------------------------- |
@@ -137,11 +138,9 @@ poster stanno nel bucket Supabase `zicca-media` e sono referenziati sia da
 ## Stato della migrazione
 
 Per la messa online e il passaggio al cliente vedi **`CONSEGNA.md`**.
-Codice, schema del database, immagini e video sono completi, e il sito non
-richiede alcuna configurazione per funzionare. Restano due punti aperti:
+Codice, database popolato, immagini e video sono completi, e il sito non
+richiede alcuna configurazione per funzionare. Resta un punto aperto:
 
-- **Dati del vecchio database** → `DATI.md`: il backend Lovable Cloud non era
-  raggiungibile al momento della migrazione; il nuovo schema è pronto e vuoto e
-  il sito usa i contenuti predefiniti.
-- **Visibilità del repository**: da rendere privato dalle impostazioni GitHub,
-  se il cliente lo preferisce.
+- **Le sei foto delle referenze** sono ancora ospitate sul vecchio sito
+  WordPress e vanno ricaricate da `/admin` → Referenze prima che il dominio
+  venga puntato su questo sito. Il pannello le segnala da solo. Vedi `DATI.md`.

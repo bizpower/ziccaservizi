@@ -70,24 +70,24 @@ registrar del cliente. Il certificato HTTPS è automatico.
 | **Sezioni custom** | Aggiunge blocchi liberi (titolo, testo markdown, immagine, pulsante) a qualsiasi pagina, con ordine e stile          |
 | **Contenuti sito** | Video e immagine di sfondo della home, **gallery video di home e Milano United** (già popolate), numeri animati, recapiti aziendali |
 
-Finché una sezione del pannello è vuota, il sito mostra i contenuti predefiniti
-già presenti nel codice: **non resta mai una pagina spoglia**, nemmeno se il
-database è irraggiungibile.
+Settori, referenze e certificazioni sono **già compilati**: il cliente li trova
+pronti nel pannello e può modificarli, riordinarli o cancellarli.
+
+Se una sezione venisse svuotata, o il database non rispondesse, il sito mostra i
+contenuti predefiniti presenti nel codice: **non resta mai una pagina spoglia**.
 
 Gli upload di immagini e PDF dal pannello finiscono nel bucket `zicca-media` e
 sono immediatamente pubblici.
 
 ## 4. Punti aperti
 
-1. **Dati del vecchio database** (`DATI.md`) — al momento della migrazione il
-   backend Lovable Cloud non era raggiungibile, quindi i contenuti inseriti da
-   Lovable non sono stati esportati. Le tabelle nuove sono vuote e il sito usa i
-   contenuti predefiniti del codice: il cliente può ripopolarle dal pannello
-   admin, oppure si riprova l'export quando Lovable torna disponibile.
-2. **Repository pubblico** — se il cliente preferisce, va reso privato da
-   GitHub → Settings → Danger Zone → Change visibility.
+1. **Le sei foto delle referenze** sono ancora ospitate sul vecchio sito
+   WordPress: vanno ricaricate da `/admin` → Referenze **prima** che il dominio
+   venga puntato su questo sito, altrimenti spariscono. Il pannello le segnala
+   da solo con un avviso, quindi non serve ricordarselo. Dettagli in `DATI.md`.
 
-Video e immagini sono invece **completi**: vedi `MEDIA.md`.
+Per il resto la piattaforma è completa: codice, database popolato, immagini e
+video (`MEDIA.md`), e nessuna configurazione richiesta per il deploy.
 
 ## 5. Verifiche già effettuate
 
@@ -109,6 +109,8 @@ Video e immagini sono invece **completi**: vedi `MEDIA.md`.
   `zicca.submit_lead` funziona, le richieste ricevute non sono leggibili
   (0 righe visibili), `zicca.claim_first_admin` non è eseguibile da anonimo.
 - Bundle client ispezionato: l'unica chiave presente è quella `anon`.
+- Contenuti caricati nel database e riletti come utente anonimo attraverso le
+  RLS: 4 settori, 8 certificazioni e 6 referenze con immagine, tutti visibili.
 
 Nota: `npm run lint` segnala 30 avvisi `no-explicit-any` ereditati dal codice
 originale. Non bloccano build né deploy; sono un eventuale intervento di pulizia

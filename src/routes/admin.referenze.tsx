@@ -5,7 +5,19 @@ import { useState } from "react";
 import { adminDeleteProject, adminListProjects, adminSaveProject } from "@/lib/content.functions";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Loader2, Eye, EyeOff } from "lucide-react";
+import { Pencil, Plus, Trash2, Loader2, Eye, EyeOff, AlertTriangle } from "lucide-react";
+
+/**
+ * Alcune foto delle referenze sono ancora ospitate sul vecchio sito WordPress:
+ * non è stato possibile scaricarle durante la migrazione. Quando il dominio
+ * verrà puntato su questo sito quegli indirizzi smetteranno di rispondere e le
+ * immagini spariranno, quindi vanno ricaricate da qui prima dello switch.
+ */
+const LEGACY_IMAGE_HOST = "ziccaservizi.it/wp-content";
+
+function isLegacyImage(url: unknown): boolean {
+  return typeof url === "string" && url.includes(LEGACY_IMAGE_HOST);
+}
 
 export const Route = createFileRoute("/admin/referenze")({
   component: AdminProjects,
@@ -44,6 +56,7 @@ function AdminProjects() {
   const [editing, setEditing] = useState<P | null>(null);
 
   const q = useQuery({ queryKey: ["admin-projects"], queryFn: () => listFn() });
+  const legacyCount = (q.data ?? []).filter((p: any) => isLegacyImage(p.image_url)).length;
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-projects"] });
 
   const save = async () => {
@@ -89,6 +102,25 @@ function AdminProjects() {
         </button>
       </div>
 
+      {legacyCount > 0 && (
+        <div className="mb-4 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 flex gap-3">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
+          <div className="text-sm">
+            <div className="font-semibold text-amber-900 dark:text-amber-200">
+              {legacyCount === 1
+                ? "1 foto è ancora ospitata sul vecchio sito"
+                : `${legacyCount} foto sono ancora ospitate sul vecchio sito`}
+            </div>
+            <p className="mt-1 text-amber-900/80 dark:text-amber-200/80">
+              Sono le immagini contrassegnate qui sotto. Finché il vecchio sito
+              resta online si vedono normalmente, ma quando il dominio verrà
+              puntato su questo sito spariranno. Apri ciascuna referenza e
+              ricarica la foto per risolvere definitivamente.
+            </p>
+          </div>
+        </div>
+      )}
+
       {q.isLoading ? (
         <Loader2 className="h-6 w-6 animate-spin text-electric" />
       ) : (
@@ -110,6 +142,12 @@ function AdminProjects() {
                 <div className="text-sm text-muted-foreground truncate">
                   {[p.client, p.category, p.year].filter(Boolean).join(" · ")}
                 </div>
+                {isLegacyImage(p.image_url) && (
+                  <div className="mt-1 inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
+                    <AlertTriangle className="h-3 w-3" />
+                    Foto sul vecchio sito — da ricaricare
+                  </div>
+                )}
               </div>
               <span
                 className={`text-xs px-2 py-1 rounded-full inline-flex items-center gap-1 ${p.published ? "bg-electric/10 text-electric" : "bg-muted text-muted-foreground"}`}
