@@ -81,6 +81,13 @@ npx supabase link --project-ref <project-ref>
 npx supabase db push
 ```
 
+Le richieste dal form contatti fanno partire una notifica email tramite un
+trigger su `zicca.leads` (`zicca.notifica_lead`), che usa `pg_net` per chiamare
+il provider di invio. La chiave sta in Supabase Vault (`RESEND_API_KEY`), i
+destinatari in `zicca.site_settings` → `lead_notification`, modificabili dal
+pannello. Se la chiave manca o non ci sono destinatari il trigger non fa nulla,
+e un errore di invio non impedisce mai il salvataggio della richiesta.
+
 Due operazioni non sarebbero esprimibili con le sole policy e passano da
 funzioni `SECURITY DEFINER`, così che nessuna tabella debba essere aperta in
 scrittura:

@@ -7,6 +7,34 @@ import { toast } from "sonner";
 import { Loader2, Save, Plus, Trash2 } from "lucide-react";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 
+/** Configurazione della notifica email delle richieste dal form contatti. */
+type LeadNotification = {
+  enabled: boolean;
+  to: string[];
+  from: string;
+  subject_prefix: string;
+};
+
+const emptyNotification: LeadNotification = {
+  enabled: true,
+  to: [],
+  from: "Sito Zicca Servizi <noreply@ziccaservizi.it>",
+  subject_prefix: "[Sito] Nuova richiesta",
+};
+
+function toNotification(value: unknown): LeadNotification {
+  const v = (value ?? {}) as Partial<LeadNotification>;
+  return {
+    enabled: v.enabled !== false,
+    to: Array.isArray(v.to) ? v.to.filter((x): x is string => typeof x === "string") : [],
+    from: typeof v.from === "string" && v.from ? v.from : emptyNotification.from,
+    subject_prefix:
+      typeof v.subject_prefix === "string" && v.subject_prefix
+        ? v.subject_prefix
+        : emptyNotification.subject_prefix,
+  };
+}
+
 export const Route = createFileRoute("/admin/contenuti")({
   component: AdminSettings,
 });
@@ -22,6 +50,7 @@ function AdminSettings() {
   const [contact, setContact] = useState<any>({});
   const [videos, setVideos] = useState<VideoEntry[]>([]);
   const [muVideos, setMuVideos] = useState<VideoEntry[]>([]);
+  const [notifica, setNotifica] = useState<LeadNotification>(emptyNotification);
 
   useEffect(() => {
     if (q.data) {
@@ -30,6 +59,7 @@ function AdminSettings() {
       setContact(q.data.contact ?? {});
       setVideos(Array.isArray(q.data.videos) ? q.data.videos : []);
       setMuVideos(Array.isArray(q.data.videos_milano_united) ? q.data.videos_milano_united : []);
+      setNotifica(toNotification(q.data.lead_notification));
     }
   }, [q.data]);
 
@@ -192,6 +222,97 @@ function AdminSettings() {
           folder="videos/milano-united"
           hint="Compaiono nella pagina /milano-united. Se la lista è vuota la sezione non viene mostrata."
         />
+      </Card>
+
+      {/* NOTIFICA RICHIESTE */}
+      <Card
+        title="Notifica email delle richieste"
+        onSave={() =>
+          save("lead_notification", {
+            ...notifica,
+            to: notifica.to.map((x) => x.trim()).filter(Boolean),
+          })
+        }
+      >
+        <p className="text-sm text-muted-foreground -mt-2 mb-4">
+          Ogni richiesta inviata dal form contatti viene sempre salvata in
+          «Richieste». Qui si decide a chi mandarne anche una copia via email.
+        </p>
+
+        <label className="flex items-center gap-2 mb-4 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={notifica.enabled}
+            onChange={(e) => setNotifica({ ...notifica, enabled: e.target.checked })}
+          />
+          Invia una email a ogni nuova richiesta
+        </label>
+
+        <Field label="Destinatari">
+          <div className="space-y-2">
+            {notifica.to.map((addr, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  className={inputCls}
+                  type="email"
+                  placeholder="nome@azienda.it"
+                  value={addr}
+                  onChange={(e) =>
+                    setNotifica({
+                      ...notifica,
+                      to: notifica.to.map((v, j) => (j === i ? e.target.value : v)),
+                    })
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setNotifica({ ...notifica, to: notifica.to.filter((_, j) => j !== i) })
+                  }
+                  aria-label="Rimuovi destinatario"
+                  className="p-2 rounded-md hover:bg-destructive/10 text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setNotifica({ ...notifica, to: [...notifica.to, ""] })}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-electric"
+            >
+              <Plus className="h-4 w-4" /> Aggiungi destinatario
+            </button>
+            {notifica.to.length === 0 && (
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Nessun destinatario: al momento non parte alcuna email. Le richieste
+                restano comunque visibili in «Richieste».
+              </p>
+            )}
+          </div>
+        </Field>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          <Field label="Mittente">
+            <input
+              className={inputCls}
+              value={notifica.from}
+              onChange={(e) => setNotifica({ ...notifica, from: e.target.value })}
+            />
+          </Field>
+          <Field label="Prefisso dell'oggetto">
+            <input
+              className={inputCls}
+              value={notifica.subject_prefix}
+              onChange={(e) => setNotifica({ ...notifica, subject_prefix: e.target.value })}
+            />
+          </Field>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          Il dominio del mittente deve essere verificato presso il provider di invio,
+          altrimenti le email non partono. Rispondendo all'email si risponde
+          direttamente a chi ha compilato il form.
+        </p>
       </Card>
 
       {/* CONTACT */}
