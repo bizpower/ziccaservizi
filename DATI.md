@@ -66,17 +66,12 @@ se il database non risponde.
 La migrazione è idempotente: ogni blocco scrive solo se la tabella è ancora
 vuota, quindi rilanciarla non duplica né sovrascrive il lavoro del cliente.
 
-### Un punto da chiudere prima dello switch del dominio
+### Le foto delle referenze
 
-Le sei foto delle referenze sono ancora ospitate sul **vecchio sito WordPress**
-(`www.ziccaservizi.it/wp-content/...`): non è stato possibile scaricarle
-dall'ambiente di migrazione, che non ha accesso di rete a quel dominio.
-
-Finché il vecchio sito resta online si vedono normalmente, ma quando il dominio
-verrà puntato su questo sito spariranno. Vanno quindi ricaricate da
-`/admin` → Referenze **prima** dello switch. Il pannello se ne accorge da solo:
-mostra un avviso in cima all'elenco e contrassegna le singole righe ancora
-agganciate al vecchio sito, così il passaggio non può essere dimenticato.
+Le sei foto della gallery non erano asset di Lovable: già nel codice originale
+erano link diretti al **vecchio sito WordPress**. Sono state scaricate finché
+quel sito era ancora online e ricaricate nel bucket `zicca-media`
+(dettagli e md5 in `MEDIA.md`), quindi il sito non dipende più da quel dominio.
 
 ## 2. Se un giorno il vecchio database tornasse raggiungibile
 

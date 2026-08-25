@@ -48,7 +48,35 @@ Gli URL pubblici sono già scritti sia in `zicca.site_settings`
 (chiavi `videos` e `videos_milano_united`, quelle che pilota il pannello admin)
 sia nei manifest `src/assets/**/*.asset.json` usati come fallback.
 
-## 3. Come si gestiscono i video da qui in avanti
+## 3. Foto delle referenze: trasferite ✅
+
+Le sei foto della gallery `/referenze` non erano asset del progetto Lovable:
+già nel codice originale erano **link diretti al vecchio sito WordPress**
+(`www.ziccaservizi.it/wp-content/...`). Poiché quel dominio verrà puntato su
+questo sito, quegli indirizzi sarebbero smessi di rispondere e la gallery si
+sarebbe svuotata.
+
+Sono state scaricate dal sito ancora online e ricaricate nel bucket
+`zicca-media`, cartella `referenze/`:
+
+| File su Supabase                   | Byte    | md5 dell'originale               |
+| ---------------------------------- | ------- | -------------------------------- |
+| `cantiere-industriale.jpg`         | 654.959 | 99bf7a1374fe7f527d41f11bf461176a |
+| `impianto-civile.jpg`              | 260.909 | f017d15598e52afc1431ef0f33d3ba0f |
+| `quadri-elettrici.jpg`             | 54.496  | adf16f2740f96a1e98168f6bab84b735 |
+| `impianto-produttivo.jpg`          | 388.563 | 45b87f64cddbcd177fa61be555b017f3 |
+| `edificio-residenziale.jpg`        | 375.351 | 72b998edb8b44d13605bdf313f30ef73 |
+| `cabina-trasformazione-genova.jpg` | 113.984 | 0ae294931d4312664c61cb164f723fb9 |
+
+Sono fotografie di cantieri reali: sono state trasferite invariate, non
+ricompresse. Gli indirizzi nuovi sono sia in `zicca.projects` sia nel fallback
+di `src/routes/referenze.tsx`.
+
+Il pannello `/admin` → Referenze continua a controllare gli indirizzi: se una
+foto venisse reinserita puntando al vecchio sito, lo segnala invece di lasciare
+che l'immagine si rompa in silenzio.
+
+## 4. Come si gestiscono i video da qui in avanti
 
 L'ordine con cui il sito sceglie cosa mostrare è:
 
