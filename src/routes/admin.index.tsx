@@ -13,9 +13,12 @@ function AdminDashboard() {
   const projectsFn = useServerFn(adminListProjects);
   const sectorsFn = useServerFn(adminListSectors);
 
+  // Le chiavi devono coincidere con quelle che le pagine di modifica invalidano
+  // dopo un salvataggio, altrimenti i contatori restano fermi finché non si
+  // ricarica la pagina.
   const leads = useQuery({ queryKey: ["leads"], queryFn: () => leadsFn() });
-  const projects = useQuery({ queryKey: ["projects"], queryFn: () => projectsFn() });
-  const sectors = useQuery({ queryKey: ["sectors"], queryFn: () => sectorsFn() });
+  const projects = useQuery({ queryKey: ["admin-projects"], queryFn: () => projectsFn() });
+  const sectors = useQuery({ queryKey: ["admin-sectors"], queryFn: () => sectorsFn() });
 
   const newLeads = (leads.data ?? []).filter((l: any) => l.status === "new").length;
 

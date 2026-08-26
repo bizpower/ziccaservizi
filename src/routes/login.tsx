@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Loader2, Lock } from "lucide-react";
+import { absoluteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -22,6 +23,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [recupero, setRecupero] = useState(false);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/admin" });
@@ -39,6 +41,27 @@ function LoginPage() {
     toast.success("Accesso effettuato");
     router.invalidate();
     navigate({ to: "/admin" });
+  };
+
+  // Invio del link di recupero. L'indirizzo di ritorno deve essere fra le
+  // "Redirect URLs" consentite in Supabase -> Authentication -> URL Configuration.
+  const onRecupero = async () => {
+    if (!email) {
+      toast.error("Inserisci prima la tua email");
+      return;
+    }
+    setRecupero(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: absoluteUrl("/reset-password"),
+    });
+    setRecupero(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    // Non si conferma se l'indirizzo esiste: eviterebbe di rivelare quali
+    // email sono registrate.
+    toast.success("Se l'indirizzo è registrato, riceverai un'email con il link");
   };
 
   return (
@@ -94,6 +117,15 @@ function LoginPage() {
               Accedi
             </button>
           </form>
+          <button
+            type="button"
+            onClick={onRecupero}
+            disabled={recupero}
+            className="mt-4 text-sm text-white/60 hover:text-white underline underline-offset-4 disabled:opacity-50 inline-flex items-center gap-2"
+          >
+            {recupero && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Password dimenticata?
+          </button>
           <p className="mt-6 text-xs text-white/50 leading-relaxed">
             Accesso riservato al personale autorizzato di Zicca Servizi. Per richiedere le
             credenziali contatta l'amministratore IT.
