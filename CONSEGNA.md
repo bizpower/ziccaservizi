@@ -10,7 +10,7 @@ Documento operativo per la messa online e il passaggio al cliente.
 | Hosting                   | Vercel, progetto `ziccaservizi` (team Bizpower SRL), collegato al repo                                                  |
 | Database + Auth + Storage | Supabase, progetto `ZiccaServizi` (`mrbkuvbxqhwrtnhmpxum`), schema `zicca`, bucket `zicca-media`                        |
 | Sito pubblico             | Home, Azienda, Settori (indice + pagina per settore), Referenze, Certificazioni, Milano United, Contatti, `sitemap.xml` |
-| Area riservata            | `/login` + `/admin` (dashboard, richieste, settori, referenze, certificazioni, sezioni custom, contenuti sito)          |
+| Area riservata            | `/login` (con recupero password) + `/admin` (dashboard, richieste, settori, referenze, certificazioni, sezioni custom, contenuti sito) |
 
 Nessuna dipendenza da Lovable: build, deploy e database sono interamente sotto
 il controllo del proprietario del repository.
@@ -89,15 +89,25 @@ posizionamento già acquisito. Conviene mappare i principali con redirect 301 in
 L'elenco degli indirizzi da mappare si ricava dalla Search Console del cliente o
 dalla sitemap del vecchio sito, finché è ancora online.
 
-### e) Sicurezza dell'accesso admin
+### e) Accesso admin: recupero password e sicurezza
 
-Supabase → Authentication → Providers → Password: attivare **Leaked password
-protection** (confronto con HaveIBeenPwned). È l'unico rilievo di sicurezza
-segnalato dall'analisi Supabase che riguardi questo sito.
+Nella pagina `/login` c'è **«Password dimenticata?»**: invia un link che porta a
+`/reset-password`, dove si imposta la nuova password. Perché funzioni serve una
+cosa sola, da fare una volta:
 
-Se si vuole il recupero password via email, va configurato un SMTP proprio in
-Supabase → Authentication → Emails: quello di default è limitato e pensato per
-i test.
+- Supabase → Authentication → URL Configuration → **Redirect URLs**: aggiungere
+  `https://www.ziccaservizi.it/reset-password` (e, finché si lavora
+  sull'anteprima, anche `https://<progetto>.vercel.app/reset-password`).
+  Senza questo Supabase rifiuta il ritorno sul sito.
+
+Le email di recupero partono dal servizio integrato di Supabase, che è
+**limitato a poche email all'ora** ed è pensato per i test. Per un uso reale
+conviene configurare un SMTP proprio in Supabase → Authentication → Emails:
+si può usare lo stesso account del provider scelto al punto (f).
+
+Infine, Supabase → Authentication → Providers → Password: attivare **Leaked
+password protection** (confronto con HaveIBeenPwned). È l'unico rilievo di
+sicurezza segnalato dall'analisi Supabase che riguardi questo sito.
 
 ### f) Notifica email delle richieste
 
@@ -164,9 +174,10 @@ Restano operazioni di messa in esercizio, tutte fuori dal codice:
 | 2 | Dominio + DNS                     | **sì**       | §2c               |
 | 3 | `SITE_URL` prima dello switch     | consigliato  | §2c               |
 | 4 | Redirect 301 dalle vecchie pagine | consigliato  | §2d               |
-| 5 | Leaked password protection        | consigliato  | §2e               |
-| 6 | Account Resend + `RESEND_API_KEY` | **sì**, per le notifiche | §2f    |
-| 7 | Destinatari delle notifiche       | **sì**, per le notifiche | pannello admin |
+| 5 | Redirect URL per il recupero password | **sì**, per «Password dimenticata» | §2e |
+| 6 | Leaked password protection        | consigliato  | §2e               |
+| 7 | Account Resend + `RESEND_API_KEY` | **sì**, per le notifiche | §2f    |
+| 8 | Destinatari delle notifiche       | **sì**, per le notifiche | pannello admin |
 
 Facoltativo: rendere privato il repository da GitHub → Settings → Danger Zone →
 Change visibility.
@@ -195,6 +206,11 @@ Change visibility.
   `og:image` assoluti, `robots.txt` con la riga `Sitemap`.
 - Analisi di sicurezza Supabase: nessun rilievo sullo schema `zicca`; tutte le
   tabelle hanno RLS attiva.
+- Area riservata provata sul database eseguendo le operazioni del pannello come
+  amministratore autenticato attraverso le RLS: lettura delle richieste e
+  gestione completa di settori, referenze, certificazioni, sezioni custom,
+  impostazioni e upload nel bucket. Un utente autenticato **non** amministratore
+  è respinto su ogni scrittura e non vede alcuna richiesta.
 - Notifica delle richieste provata sul database: con destinatari configurati ma
   chiave assente, e con HTML ostile nel contenuto, la richiesta viene comunque
   salvata e il trigger non solleva errori. L'escape HTML del contenuto è stato

@@ -29,6 +29,9 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
+// Navigazione interna: va usato `Link`, non `<a href>`. Con un anchor ogni voce
+// del menu ricarica l'intera applicazione, azzerando le query in cache e
+// rileggendo la sessione a ogni click.
 const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/lead", label: "Richieste", icon: Inbox },
@@ -134,9 +137,9 @@ function AdminLayout() {
             const Icon = item.icon;
             const active = item.exact ? path === item.to : path.startsWith(item.to);
             return (
-              <a
+              <Link
                 key={item.to}
-                href={item.to}
+                to={item.to}
                 className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition ${
                   active
                     ? "bg-electric/15 text-electric border border-electric/30"
@@ -145,7 +148,7 @@ function AdminLayout() {
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
-              </a>
+              </Link>
             );
           })}
         </nav>
@@ -171,9 +174,9 @@ function AdminLayout() {
         </header>
         <nav className="lg:hidden flex overflow-x-auto bg-ink text-white/80 border-t border-white/10">
           {nav.map((i) => (
-            <a key={i.to} href={i.to} className="px-4 py-3 text-xs whitespace-nowrap">
+            <Link key={i.to} to={i.to} className="px-4 py-3 text-xs whitespace-nowrap">
               {i.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <main className="p-6 lg:p-10 max-w-6xl mx-auto">

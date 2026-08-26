@@ -17,6 +17,7 @@ import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MilanoUnitedRouteImport } from './routes/milano-united'
 import { Route as ReferenzeRouteImport } from './routes/referenze'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCertificazioniRouteImport } from './routes/admin.certificazioni'
@@ -66,6 +67,11 @@ const MilanoUnitedRoute = MilanoUnitedRouteImport.update({
 const ReferenzeRoute = ReferenzeRouteImport.update({
   id: '/referenze',
   path: '/referenze',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/milano-united': typeof MilanoUnitedRoute
   '/referenze': typeof ReferenzeRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/certificazioni': typeof AdminCertificazioniRoute
   '/admin/contenuti': typeof AdminContenutiRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/milano-united': typeof MilanoUnitedRoute
   '/referenze': typeof ReferenzeRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/certificazioni': typeof AdminCertificazioniRoute
   '/admin/contenuti': typeof AdminContenutiRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/milano-united': typeof MilanoUnitedRoute
   '/referenze': typeof ReferenzeRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/certificazioni': typeof AdminCertificazioniRoute
   '/admin/contenuti': typeof AdminContenutiRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/milano-united'
     | '/referenze'
+    | '/reset-password'
     | '/sitemap.xml'
     | '/admin/certificazioni'
     | '/admin/contenuti'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/milano-united'
     | '/referenze'
+    | '/reset-password'
     | '/sitemap.xml'
     | '/admin/certificazioni'
     | '/admin/contenuti'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/milano-united'
     | '/referenze'
+    | '/reset-password'
     | '/sitemap.xml'
     | '/admin/certificazioni'
     | '/admin/contenuti'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MilanoUnitedRoute: typeof MilanoUnitedRoute
   ReferenzeRoute: typeof ReferenzeRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SettoriSlugRoute: typeof SettoriSlugRoute
   SettoriIndexRoute: typeof SettoriIndexRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/referenze'
       fullPath: '/referenze'
       preLoaderRoute: typeof ReferenzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -417,6 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MilanoUnitedRoute: MilanoUnitedRoute,
   ReferenzeRoute: ReferenzeRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SettoriSlugRoute: SettoriSlugRoute,
   SettoriIndexRoute: SettoriIndexRoute,
