@@ -144,7 +144,7 @@ nessun caso.
 
 | Sezione admin      | Effetto sul sito                                                                                                     |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| **Richieste**      | Elenco dei contatti arrivati dal form, con stato (nuova / in lavorazione / chiusa) ed eliminazione                   |
+| **Richieste**      | Elenco dei contatti arrivati dal form, con stato (nuova / in lavorazione / chiusa), **note interne** ed eliminazione |
 | **Settori**        | Pilota la sezione settori in home, la pagina `/settori` e le pagine di dettaglio `/settori/<slug>`                   |
 | **Referenze**      | Pilota la gallery di `/referenze`, con filtro per categoria                                                          |
 | **Certificazioni** | Pilota le schede di `/certificazioni`, con link al PDF quando caricato                                               |
@@ -206,6 +206,10 @@ Change visibility.
   `og:image` assoluti, `robots.txt` con la riga `Sitemap`.
 - Analisi di sicurezza Supabase: nessun rilievo sullo schema `zicca`; tutte le
   tabelle hanno RLS attiva.
+- Confronto integrale con il progetto Lovable originale: rotte, superficie delle
+  server function (26 export), campi di tutti gli schemi di validazione, form
+  del pannello, componente delle sezioni personalizzate, navbar e sezioni della
+  homepage coincidono. Nessuna funzionalità persa nella migrazione.
 - Area riservata provata sul database eseguendo le operazioni del pannello come
   amministratore autenticato attraverso le RLS: lettura delle richieste e
   gestione completa di settori, referenze, certificazioni, sezioni custom,
