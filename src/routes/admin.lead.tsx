@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { adminDeleteLead, adminListLeads, adminUpdateLead } from "@/lib/content.functions";
 import { toast } from "sonner";
-import { Mail, Phone, Trash2, Loader2 } from "lucide-react";
+import { Mail, Phone, Trash2, Loader2, Save } from "lucide-react";
 
 export const Route = createFileRoute("/admin/lead")({
   component: AdminLeads,
@@ -16,12 +16,35 @@ function AdminLeads() {
   const delFn = useServerFn(adminDeleteLead);
   const qc = useQueryClient();
   const [selected, setSelected] = useState<string | null>(null);
+  // Note interne alla richiesta: la colonna e la server function esistevano già,
+  // mancava solo il campo per compilarle.
+  const [note, setNote] = useState("");
+  const [salvandoNote, setSalvandoNote] = useState(false);
 
   const q = useQuery({ queryKey: ["leads"], queryFn: () => listFn() });
   const leads = q.data ?? [];
   const current = leads.find((l: any) => l.id === selected) ?? leads[0];
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["leads"] });
+
+  // Ricarica le note quando cambia la richiesta selezionata.
+  useEffect(() => {
+    setNote(current?.notes ?? "");
+  }, [current?.id, current?.notes]);
+
+  const salvaNote = async () => {
+    if (!current) return;
+    setSalvandoNote(true);
+    try {
+      await updFn({ data: { id: current.id, notes: note.trim() || null } });
+      toast.success("Note salvate");
+      refresh();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Errore nel salvataggio");
+    } finally {
+      setSalvandoNote(false);
+    }
+  };
 
   const setStatus = async (id: string, status: "new" | "in_progress" | "closed") => {
     await updFn({ data: { id, status } });
@@ -156,6 +179,36 @@ function AdminLeads() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Note interne
+                  </div>
+                  <button
+                    onClick={salvaNote}
+                    disabled={salvandoNote || note === (current.notes ?? "")}
+                    className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md bg-electric text-electric-foreground font-semibold hover:shadow-glow disabled:opacity-40"
+                  >
+                    {salvandoNote ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Save className="h-3.5 w-3.5" />
+                    )}
+                    Salva note
+                  </button>
+                </div>
+                <textarea
+                  rows={4}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Appunti sulla lavorazione: chi ha richiamato, quando, esito…"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-electric"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Visibili solo agli amministratori, non vengono inviate a chi ha scritto.
+                </p>
               </div>
 
               <div className="text-xs text-muted-foreground pt-2">
